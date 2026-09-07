@@ -44,20 +44,23 @@ namespace JiebaNet.Segmenter.PosSeg
             try
             {
                 _wordTagTab = new Dictionary<string, string>();
-                var lines = File.ReadAllLines(ConfigManager.MainDictFile, Encoding.UTF8);
-                foreach (var line in lines)
+                using (var sr = new StreamReader(ConfigManager.OpenResource("dict.txt"), Encoding.UTF8))
                 {
-                    var tokens = line.Split(' ');
-                    if (tokens.Length < 2)
+                    string line;
+                    while ((line = sr.ReadLine()) != null)
                     {
-                        Debug.Fail(string.Format("Invalid line: {0}", line));
-                        continue;
+                        var tokens = line.Split(' ');
+                        if (tokens.Length < 2)
+                        {
+                            Debug.Fail(string.Format("Invalid line: {0}", line));
+                            continue;
+                        }
+
+                        var word = tokens[0];
+                        var tag = tokens[2];
+
+                        _wordTagTab[word] = tag;
                     }
-
-                    var word = tokens[0];
-                    var tag = tokens[2];
-
-                    _wordTagTab[word] = tag;
                 }
             }
             catch (IOException e)

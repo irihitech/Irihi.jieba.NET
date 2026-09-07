@@ -14,7 +14,8 @@ namespace JiebaNet.Segmenter.Tests
             var dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             Directory.SetCurrentDirectory(dir);
 
-            ConfigManager.ConfigFileBaseDir = Path.Combine(dir, "Resources");
+            // No ConfigFileBaseDir is set on purpose: the test suite exercises the
+            // default embedded-resource loading path of the library.
         }
 
         [OneTimeTearDown]

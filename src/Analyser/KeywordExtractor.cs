@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using JiebaNet.Segmenter;
 
 namespace JiebaNet.Analyser
 {
@@ -13,6 +14,23 @@ namespace JiebaNet.Analyser
         };
 
         protected virtual ISet<string> StopWords { get; set; }
+
+        /// <summary>
+        /// Loads the built-in stop words from the embedded resources.
+        /// </summary>
+        protected void SetDefaultStopWords()
+        {
+            StopWords = new HashSet<string>();
+
+            using (var reader = new StreamReader(ConfigManager.OpenResource("stopwords.txt")))
+            {
+                string line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    StopWords.Add(line.Trim());
+                }
+            }
+        }
 
         public void SetStopWords(string stopWordsFile)
         {

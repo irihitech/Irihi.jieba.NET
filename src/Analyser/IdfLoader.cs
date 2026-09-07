@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using JiebaNet.Segmenter;
 
 namespace JiebaNet.Analyser
 {
@@ -11,7 +12,21 @@ namespace JiebaNet.Analyser
         internal IDictionary<string, double> IdfFreq { get; set; }
         internal double MedianIdf { get; set; }
 
-        public IdfLoader(string idfPath = null)
+        /// <summary>
+        /// Creates a loader and loads the built-in idf file from the embedded resources.
+        /// </summary>
+        public IdfLoader()
+        {
+            IdfFilePath = string.Empty;
+            IdfFreq = new Dictionary<string, double>();
+            MedianIdf = 0.0;
+            LoadFrom(ConfigManager.OpenResource("idf.txt"));
+        }
+
+        /// <summary>
+        /// Creates a loader and loads idf values from the given file.
+        /// </summary>
+        public IdfLoader(string idfPath)
         {
             IdfFilePath = string.Empty;
             IdfFreq = new Dictionary<string, double>();
@@ -28,9 +43,17 @@ namespace JiebaNet.Analyser
             if (IdfFilePath != idfPath)
             {
                 IdfFilePath = idfPath;
-                var lines = File.ReadAllLines(idfPath, Encoding.UTF8);
+                LoadFrom(File.OpenRead(idfPath));
+            }
+        }
+
+        private void LoadFrom(Stream stream)
+        {
+            using (var reader = new StreamReader(stream, Encoding.UTF8))
+            {
                 IdfFreq = new Dictionary<string, double>();
-                foreach (var line in lines)
+                string line;
+                while ((line = reader.ReadLine()) != null)
                 {
                     var parts = line.Trim().Split(' ');
                     var word = parts[0];
