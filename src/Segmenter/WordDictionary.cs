@@ -15,6 +15,13 @@ namespace JiebaNet.Segmenter
         internal IDictionary<string, int> Trie = new Dictionary<string, int>();
 
         /// <summary>
+        /// Character-level prefix index over the same data as <see cref="Trie"/>,
+        /// kept in sync by <see cref="AddWord(string, int, string)"/>; used by the
+        /// segmentation hot path to avoid substring allocations.
+        /// </summary>
+        internal WordDictNode Root { get; } = new WordDictNode();
+
+        /// <summary>
         /// total occurrence of all words.
         /// </summary>
         public double Total { get; set; }
@@ -56,6 +63,7 @@ namespace JiebaNet.Segmenter
 
                         Trie[word] = freq;
                         Total += freq;
+                        AddToFastTrie(word, freq);
 
                         foreach (var ch in Enumerable.Range(0, word.Length))
                         {
@@ -63,6 +71,7 @@ namespace JiebaNet.Segmenter
                             if (!Trie.ContainsKey(wfrag))
                             {
                                 Trie[wfrag] = 0;
+                                AddToFastTrie(wfrag, 0);
                             }
                         }
                     }
@@ -103,14 +112,29 @@ namespace JiebaNet.Segmenter
 
             Trie[word] = freq;
             Total += freq;
+            AddToFastTrie(word, freq);
+
             for (var i = 0; i < word.Length; i++)
             {
                 var wfrag = word.Substring(0, i + 1);
                 if (!Trie.ContainsKey(wfrag))
                 {
                     Trie[wfrag] = 0;
+                    AddToFastTrie(wfrag, 0);
                 }
             }
+        }
+
+        private void AddToFastTrie(string word, int freq)
+        {
+            var node = Root;
+            foreach (var ch in word)
+            {
+                node = node.GetOrAddChild(ch);
+            }
+
+            node.Freq = freq;
+            node.LogFreq = freq > 0 ? Math.Log(freq) : 0;
         }
 
         public void DeleteWord(string word)

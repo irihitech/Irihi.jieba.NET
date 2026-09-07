@@ -26,8 +26,16 @@ function Invoke-Bench([string]$project, [string]$label)
 
     Write-Host ""
     Write-Host "===== Running $label (a few minutes) =====" -ForegroundColor Cyan
-    dotnet run --project "$benchmarkDir\$project\$project.csproj" -c Release --no-build -- --filter "$Filter"
-    if ($LASTEXITCODE -ne 0) { throw "benchmark failed: $project" }
+    Push-Location "$benchmarkDir\$project"
+    try
+    {
+        dotnet run --project "$benchmarkDir\$project\$project.csproj" -c Release --no-build -- --filter "$Filter"
+        if ($LASTEXITCODE -ne 0) { throw "benchmark failed: $project" }
+    }
+    finally
+    {
+        Pop-Location
+    }
 
     Write-Host ""
     Write-Host "===== $label cold start (3 fresh processes) =====" -ForegroundColor Cyan
