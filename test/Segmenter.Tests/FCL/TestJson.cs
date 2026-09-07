@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Newtonsoft.Json;
+using System.Text.Json;
 using NUnit.Framework;
 
 namespace JiebaNet.Segmenter.Tests.FCL
@@ -15,7 +15,7 @@ namespace JiebaNet.Segmenter.Tests.FCL
         {
             var p = TestHelper.GetResourceFilePath("test_dict.json");
             var jsonContent = File.ReadAllText(p);
-            var probs = JsonConvert.DeserializeObject<Dictionary<char, double>>(jsonContent);
+            var probs = JsonSerializer.Deserialize<Dictionary<char, double>>(jsonContent);
             Assert.That(probs, Is.Not.Null);
             Assert.That(probs.Count, Is.EqualTo(3));
             Assert.That(probs['上'], Is.EqualTo(-8.541143017159477));
@@ -26,7 +26,7 @@ namespace JiebaNet.Segmenter.Tests.FCL
         {
             var p = TestHelper.GetResourceFilePath("pos_prob_start.json");
             var jsonContent = File.ReadAllText(p);
-            var probs = JsonConvert.DeserializeObject<IDictionary<string, double>>(jsonContent);
+            var probs = JsonSerializer.Deserialize<IDictionary<string, double>>(jsonContent);
             Assert.That(probs, Is.Not.Null);
             Assert.That(probs.Count, Is.EqualTo(256));
             Assert.That(probs["B-f"], Is.EqualTo(-5.491630418482717));
@@ -37,7 +37,7 @@ namespace JiebaNet.Segmenter.Tests.FCL
         {
             var p = TestHelper.GetResourceFilePath("pos_prob_trans.json");
             var jsonContent = File.ReadAllText(p);
-            var probs = JsonConvert.DeserializeObject<IDictionary<string, IDictionary<string, double>>>(jsonContent);
+            var probs = JsonSerializer.Deserialize<IDictionary<string, IDictionary<string, double>>>(jsonContent);
             Assert.That(probs, Is.Not.Null);
             Assert.That(probs.Count, Is.EqualTo(256));
             Assert.That(probs.Select(k => k.Value.Count).Sum(), Is.EqualTo(5218));
@@ -49,7 +49,7 @@ namespace JiebaNet.Segmenter.Tests.FCL
         {
             var p = TestHelper.GetResourceFilePath("pos_prob_emit.json");
             var jsonContent = File.ReadAllText(p);
-            var probs = JsonConvert.DeserializeObject<IDictionary<string, IDictionary<char, double>>>(jsonContent);
+            var probs = JsonSerializer.Deserialize<IDictionary<string, IDictionary<char, double>>>(jsonContent);
             Assert.That(probs, Is.Not.Null);
             Assert.That(probs.Count, Is.EqualTo(256));
             Assert.That(probs.Select(k => k.Value.Count).Sum(), Is.EqualTo(89290));
@@ -61,7 +61,7 @@ namespace JiebaNet.Segmenter.Tests.FCL
         {
             var p = TestHelper.GetResourceFilePath("char_state_tab.json");
             var jsonContent = File.ReadAllText(p);
-            var probs = JsonConvert.DeserializeObject<IDictionary<string, List<string>>>(jsonContent);
+            var probs = JsonSerializer.Deserialize<IDictionary<string, List<string>>>(jsonContent);
             Assert.That(probs, Is.Not.Null);
             Assert.That(probs.Count, Is.EqualTo(6648));
             Assert.That(probs.Select(k => k.Value.Count).Sum(), Is.EqualTo(66162));
@@ -79,7 +79,7 @@ namespace JiebaNet.Segmenter.Tests.FCL
                 {'M', -3.14e+100},
                 {'S', -1.4652633398537678}
             };
-            var output = JsonConvert.SerializeObject(d);
+            var output = JsonSerializer.Serialize(d);
             Console.WriteLine(output);
         }
     }
