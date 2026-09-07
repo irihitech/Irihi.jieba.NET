@@ -85,14 +85,16 @@ namespace JiebaNet.Segmenter.FinalSeg
 
         private IEnumerable<string> ViterbiCut(string sentence)
         {
-            var v = new List<IDictionary<char, double>>();
+            var v = new List<Dictionary<char, double>>();
             IDictionary<char, Node> path = new Dictionary<char, Node>();
 
             // Init weights and paths.
             v.Add(new Dictionary<char, double>());
             foreach (var state in States)
             {
-                var emP = _emitProbs[state].GetDefault(sentence[0], Constants.MinProb);
+                var emP = _emitProbs[state].TryGetValue(sentence[0], out var startEmit)
+                    ? startEmit
+                    : Constants.MinProb;
                 v[0][state] = _startProbs[state] + emP;
                 path[state] = new Node(state, null);
             }
@@ -100,18 +102,23 @@ namespace JiebaNet.Segmenter.FinalSeg
             // For each remaining char
             for (var i = 1; i < sentence.Length; ++i)
             {
-                IDictionary<char, double> vv = new Dictionary<char, double>();
+                var vPrev = v[i - 1];
+                var vv = new Dictionary<char, double>();
                 v.Add(vv);
                 IDictionary<char, Node> newPath = new Dictionary<char, Node>();
                 foreach (var y in States)
                 {
-                    var emp = _emitProbs[y].GetDefault(sentence[i], Constants.MinProb);
+                    var emp = _emitProbs[y].TryGetValue(sentence[i], out var emitValue)
+                        ? emitValue
+                        : Constants.MinProb;
 
                     Pair<char> candidate = new Pair<char>('\0', double.MinValue);
                     foreach (var y0 in _prevStatus[y])
                     {
-                        var tranp = _transProbs[y0].GetDefault(y, Constants.MinProb);
-                        tranp = v[i - 1][y0] + tranp + emp;
+                        var tranp = _transProbs[y0].TryGetValue(y, out var tranValue)
+                            ? tranValue
+                            : Constants.MinProb;
+                        tranp = vPrev[y0] + tranp + emp;
                         if (candidate.Freq <= tranp)
                         {
                             candidate.Freq = tranp;

@@ -80,7 +80,7 @@ namespace JiebaNet.Segmenter.PosSeg
             var allStates = _transProbs.Keys.ToList();
 
             // Init weights and paths.
-            v.Add(new Dictionary<string, Double>());
+            v.Add(new Dictionary<string, double>());
             memPath.Add(new Dictionary<string, string>());
             foreach (var state in _stateTab.GetDefault(sentence[0], allStates))
             {
@@ -89,41 +89,79 @@ namespace JiebaNet.Segmenter.PosSeg
                 memPath[0][state] = string.Empty;
             }
 
+            // Reusable buffers for the per-position computations below.
+            var prevStates = new List<string>();
+            var curPossibleStates = new HashSet<string>();
+            var obsStates = new List<string>();
+
             // For each remaining char
             for (var i = 1; i < sentence.Length; ++i)
             {
-                v.Add(new Dictionary<string, double>());
-                memPath.Add(new Dictionary<string, string>());
+                var vPrev = v[i - 1];
+                var pathPrev = memPath[i - 1];
 
-                var prevStates = memPath[i - 1].Keys.Where(k => _transProbs[k].Count > 0);
-                var curPossibleStates = new HashSet<string>(prevStates.SelectMany(s => _transProbs[s].Keys));
-
-                IEnumerable<string> obsStates = _stateTab.GetDefault(sentence[i], allStates);
-                obsStates = curPossibleStates.Intersect(obsStates);
-
-                if (!obsStates.Any())
+                prevStates.Clear();
+                foreach (var key in pathPrev.Keys)
                 {
-                    if (curPossibleStates.Count > 0)
+                    if (_transProbs[key].Count > 0)
                     {
-                        obsStates = curPossibleStates;
-                    }
-                    else
-                    {
-                        obsStates = allStates;
+                        prevStates.Add(key);
                     }
                 }
 
+                curPossibleStates.Clear();
+                foreach (var s in prevStates)
+                {
+                    var transitions = _transProbs[s];
+                    foreach (var next in transitions.Keys)
+                    {
+                        curPossibleStates.Add(next);
+                    }
+                }
+
+                obsStates.Clear();
+                foreach (var s in _stateTab.GetDefault(sentence[i], allStates))
+                {
+                    if (curPossibleStates.Contains(s))
+                    {
+                        obsStates.Add(s);
+                    }
+                }
+
+                if (obsStates.Count == 0)
+                {
+                    if (curPossibleStates.Count > 0)
+                    {
+                        foreach (var s in curPossibleStates)
+                        {
+                            obsStates.Add(s);
+                        }
+                    }
+                    else
+                    {
+                        obsStates.AddRange(allStates);
+                    }
+                }
+
+                var vCur = new Dictionary<string, double>();
+                var pathCur = new Dictionary<string, string>();
+
                 foreach (var y in obsStates)
                 {
-                    var emp = _emitProbs[y].GetDefault(sentence[i], Constants.MinProb);
+                    var emit = _emitProbs[y];
+                    var emp = emit.TryGetValue(sentence[i], out var emitValue)
+                        ? emitValue
+                        : Constants.MinProb;
 
                     var prob = double.MinValue;
                     var state = string.Empty;
 
                     foreach (var y0 in prevStates)
                     {
-                        var tranp = _transProbs[y0].GetDefault(y, double.MinValue);
-                        tranp = v[i - 1][y0] + tranp + emp;
+                        var tranp = _transProbs[y0].TryGetValue(y, out var tranValue)
+                            ? tranValue
+                            : double.MinValue;
+                        tranp = vPrev[y0] + tranp + emp;
                         // TODO: compare two very small values;
                         // TODO: how to deal with negative infinity
                         if (prob < tranp ||
@@ -133,9 +171,13 @@ namespace JiebaNet.Segmenter.PosSeg
                             state = y0;
                         }
                     }
-                    v[i][y] = prob;
-                    memPath[i][y] = state;
+
+                    vCur[y] = prob;
+                    pathCur[y] = state;
                 }
+
+                v.Add(vCur);
+                memPath.Add(pathCur);
             }
 
             var vLast = v.Last();
@@ -145,7 +187,7 @@ namespace JiebaNet.Segmenter.PosSeg
             foreach (var endPoint in last)
             {
                 // TODO: compare two very small values;
-                if (endProb < endPoint.Prob || 
+                if (endProb < endPoint.Prob ||
                     (endProb == endPoint.Prob && String.Compare(endState, endPoint.State, StringComparison.InvariantCulture) < 0))
                 {
                     endProb = endPoint.Prob;
