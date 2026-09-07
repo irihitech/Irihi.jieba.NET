@@ -30,28 +30,32 @@ jieba.NET是[jieba中文分词](https://github.com/fxsjy/jieba)的.NET版本（C
 PM> Install-Package jieba.NET
 ```
 
-安装之后，在packages\jieba.NET目录下可以看到Resources目录，这里面是jieba.NET运行所需的词典及其它数据文件，最简单的配置方法是将整个Resources目录拷贝到程序集所在目录，这样jieba.NET会使用内置的默认配置值。如果希望将这些文件放在其它位置，则要在app.config或web.config中添加如下的配置项：
-
-```xml
-<appSettings>
-    <add key="JiebaConfigFileDir" value="C:\jiebanet\config" />
-</appSettings>
-```
-
-需要注意的是，这个路径可以使用绝对路径或相对路径。**如果使用相对路径，那么jieba.NET会假设该路径是相对于当前应用程序域的BaseDirectory**。
-
-配置示例：
-
-* 采用绝对路径时，比如配置项为C:\jiebanet\config，那么主词典的路径会拼接为：C:\jiebanet\config\dict.txt。
-* 采用相对路径时（或未添加任何配置项，那么将会使用默认的**相对路径：Resources**），比如配置项为..\config（可通过..来调整相对路径），若当前应用程序域的BaseDirectory是C:\myapp\bin\，那么主词典的路径会拼接为：C:\myapp\config\dict.txt。
+安装之后，在packages\jieba.NET目录下可以看到Resources目录，这里面是jieba.NET运行所需的词典及其它数据文件，最简单的配置方法是将整个Resources目录拷贝到程序集所在目录，这样jieba.NET会使用内置的默认配置值。如果希望将这些文件放在其它位置，有两种配置方法：
 
 ### 使用代码配置词典路径
 
-如果因为某些原因，不方便通过应用的 config 文件配置，可使用代码设置（在使用任何分词功能之前，建议使用绝对路径），如：
+在使用任何分词功能之前设置（建议使用绝对路径），如：
 
 ```c#
 JiebaNet.Segmenter.ConfigManager.ConfigFileBaseDir = @"C:\jiebanet\config";
 ```
+
+### 使用环境变量配置词典路径
+
+设置环境变量 `JIEBA_CONFIG_FILE_DIR`，如：
+
+```shell
+set JIEBA_CONFIG_FILE_DIR=C:\jiebanet\config
+```
+
+需要注意的是，这个路径可以使用绝对路径或相对路径。**如果使用相对路径，那么jieba.NET会假设该路径是相对于应用程序目录（AppContext.BaseDirectory）**。
+
+配置示例：
+
+* 采用绝对路径时，比如配置为C:\jiebanet\config，那么主词典的路径会拼接为：C:\jiebanet\config\dict.txt。
+* 采用相对路径时（或未做任何配置，那么将会使用默认的**相对路径：Resources**），比如配置为..\config（可通过..来调整相对路径），若应用程序目录是C:\myapp\bin\，那么主词典的路径会拼接为：C:\myapp\config\dict.txt。
+
+> 说明：0.42.2及之前的版本通过app.config/web.config的appSettings项（键为JiebaConfigFileDir）来配置，该机制已被移除。现代.NET（6及以上）的应用可以在修剪（trimmed）或NativeAOT发布中使用jieba.NET，分词所需的HMM模型通过System.Text.Json源生成加载，不依赖反射。
 
 ## 主要功能
 

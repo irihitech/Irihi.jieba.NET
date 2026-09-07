@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Configuration;
 using System.IO;
 using JiebaNet.Segmenter.Common;
 
@@ -7,6 +6,9 @@ namespace JiebaNet.Segmenter
 {
     public class ConfigManager
     {
+        public const string ConfigFileDirEnvVar = "JIEBA_CONFIG_FILE_DIR";
+        public const string LegacyConfigFileDirEnvVar = "JiebaConfigFileDir";
+
         private static string _configFileBaseDir = null;
 
         public static string ConfigFileBaseDir
@@ -15,11 +17,12 @@ namespace JiebaNet.Segmenter
             {
                 if (_configFileBaseDir.IsNull())
                 {
-                    var configFileDir = ConfigurationManager.AppSettings["JiebaConfigFileDir"] ?? "Resources";
+                    var configFileDir = Environment.GetEnvironmentVariable(ConfigFileDirEnvVar)
+                                      ?? Environment.GetEnvironmentVariable(LegacyConfigFileDirEnvVar)
+                                      ?? "Resources";
                     if (!Path.IsPathRooted(configFileDir))
                     {
-                        var domainDir = AppDomain.CurrentDomain.BaseDirectory;
-                        configFileDir = Path.GetFullPath(Path.Combine(domainDir, configFileDir));
+                        configFileDir = Path.GetFullPath(Path.Combine(BaseDirectory, configFileDir));
                     }
                     _configFileBaseDir = configFileDir;
                 }
@@ -27,6 +30,18 @@ namespace JiebaNet.Segmenter
                 return _configFileBaseDir;
             }
             set { _configFileBaseDir = value; }
+        }
+
+        private static string BaseDirectory
+        {
+            get
+            {
+#if NETSTANDARD2_0
+                return AppContext.BaseDirectory;
+#else
+                return AppDomain.CurrentDomain.BaseDirectory;
+#endif
+            }
         }
 
         public static string MainDictFile
