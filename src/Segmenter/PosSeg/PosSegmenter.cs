@@ -183,7 +183,9 @@ namespace JiebaNet.Segmenter.PosSeg
         internal IEnumerable<Pair> CutDag(string sentence)
         {
             var dag = _segmenter.GetDag(sentence);
-            var route = _segmenter.Calc(sentence, dag);
+            var routeEnd = new int[sentence.Length + 1];
+            var routeFreq = new double[sentence.Length + 1];
+            _segmenter.Calc(dag, routeEnd, routeFreq);
 
             var tokens = new List<Pair>();
 
@@ -192,7 +194,7 @@ namespace JiebaNet.Segmenter.PosSeg
             var buf = string.Empty;
             while (x < n)
             {
-                var y = route[x].Key + 1;
+                var y = routeEnd[x] + 1;
                 var w = sentence.Substring(x, y - x);
                 if (y - x == 1)
                 {
@@ -221,7 +223,9 @@ namespace JiebaNet.Segmenter.PosSeg
         internal IEnumerable<Pair> CutDagWithoutHmm(string sentence)
         {
             var dag = _segmenter.GetDag(sentence);
-            var route = _segmenter.Calc(sentence, dag);
+            var routeEnd = new int[sentence.Length + 1];
+            var routeFreq = new double[sentence.Length + 1];
+            _segmenter.Calc(dag, routeEnd, routeFreq);
 
             var tokens = new List<Pair>();
 
@@ -232,7 +236,7 @@ namespace JiebaNet.Segmenter.PosSeg
             var y = -1;
             while (x < n)
             {
-                y = route[x].Key + 1;
+                y = routeEnd[x] + 1;
                 var w = sentence.Substring(x, y - x);
                 // TODO: char or word?
                 if (RegexEnglishChar().IsMatch(w))

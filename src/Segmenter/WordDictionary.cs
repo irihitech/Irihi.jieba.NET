@@ -19,12 +19,14 @@ namespace JiebaNet.Segmenter
         /// kept in sync by <see cref="AddWord(string, int, string)"/>; used by the
         /// segmentation hot path to avoid substring allocations.
         /// </summary>
-        internal WordDictNode Root { get; } = new WordDictNode();
+        internal WordDictIndex Index { get; } = new WordDictIndex();
 
         /// <summary>
         /// total occurrence of all words.
         /// </summary>
         public double Total { get; set; }
+
+        private readonly List<int> _indexPath = new List<int>(16);
 
         private WordDictionary()
         {
@@ -51,27 +53,36 @@ namespace JiebaNet.Segmenter
                     string line = null;
                     while ((line = sr.ReadLine()) != null)
                     {
-                        var tokens = line.Split(' ');
-                        if (tokens.Length < 2)
+                        var span = line.AsSpan();
+                        var firstSpace = span.IndexOf(' ');
+                        if (firstSpace < 0)
                         {
                             Debug.Fail(string.Format("Invalid line: {0}", line));
                             continue;
                         }
 
-                        var word = tokens[0];
-                        var freq = int.Parse(tokens[1]);
+                        var wordSpan = span.Slice(0, firstSpace);
+                        var rest = span.Slice(firstSpace + 1);
+                        var secondSpace = rest.IndexOf(' ');
+                        var freqSpan = secondSpace < 0 ? rest : rest.Slice(0, secondSpace);
+                        if (!int.TryParse(freqSpan, out var freq))
+                        {
+                            throw new FormatException($"Invalid frequency '{freqSpan.ToString()}': {line}");
+                        }
+
+                        var word = wordSpan.ToString();
 
                         Trie[word] = freq;
                         Total += freq;
-                        AddToFastTrie(word, freq);
+                        AddToFastTrie(word, freq, _indexPath);
 
-                        foreach (var ch in Enumerable.Range(0, word.Length))
+                        for (var i = 0; i < word.Length; i++)
                         {
-                            var wfrag = word.Sub(0, ch + 1);
+                            var wfrag = word.Substring(0, i + 1);
                             if (!Trie.ContainsKey(wfrag))
                             {
                                 Trie[wfrag] = 0;
-                                AddToFastTrie(wfrag, 0);
+                                Index.SetWordFreq(_indexPath[i], 0);
                             }
                         }
                     }
@@ -95,6 +106,21 @@ namespace JiebaNet.Segmenter
             return Trie.ContainsKey(word) && Trie[word] > 0;
         }
 
+        public bool ContainsWord(ReadOnlySpan<char> word)
+        {
+            var node = Index.Root;
+            foreach (var ch in word)
+            {
+                node = Index.GetChild(node, ch);
+                if (node < 0)
+                {
+                    return false;
+                }
+            }
+
+            return Index.IsWordEnd(node);
+        }
+
         public int GetFreqOrDefault(string key)
         {
             if (ContainsWord(key))
@@ -112,7 +138,7 @@ namespace JiebaNet.Segmenter
 
             Trie[word] = freq;
             Total += freq;
-            AddToFastTrie(word, freq);
+            AddToFastTrie(word, freq, _indexPath);
 
             for (var i = 0; i < word.Length; i++)
             {
@@ -120,21 +146,22 @@ namespace JiebaNet.Segmenter
                 if (!Trie.ContainsKey(wfrag))
                 {
                     Trie[wfrag] = 0;
-                    AddToFastTrie(wfrag, 0);
+                    Index.SetWordFreq(_indexPath[i], 0);
                 }
             }
         }
 
-        private void AddToFastTrie(string word, int freq)
+        private void AddToFastTrie(string word, int freq, List<int> path)
         {
-            var node = Root;
+            path.Clear();
+            var node = Index.Root;
             foreach (var ch in word)
             {
-                node = node.GetOrAddChild(ch);
+                node = Index.GetOrAddChild(node, ch);
+                path.Add(node);
             }
 
-            node.Freq = freq;
-            node.LogFreq = freq > 0 ? Math.Log(freq) : 0;
+            Index.SetWordFreq(node, freq);
         }
 
         public void DeleteWord(string word)
