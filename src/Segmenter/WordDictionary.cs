@@ -11,7 +11,6 @@ namespace JiebaNet.Segmenter
     public class WordDictionary
     {
         private static readonly Lazy<WordDictionary> lazy = new Lazy<WordDictionary>(() => new WordDictionary());
-        private static readonly string MainDict = ConfigManager.MainDictFile;
 
         internal IDictionary<string, int> Trie = new Dictionary<string, int>();
 
@@ -40,7 +39,7 @@ namespace JiebaNet.Segmenter
                 var stopWatch = new Stopwatch();
                 stopWatch.Start();
 
-                using (var sr = new StreamReader(MainDict, Encoding.UTF8))
+                using (var sr = new StreamReader(ConfigManager.OpenResource("dict.txt"), Encoding.UTF8))
                 {
                     string line = null;
                     while ((line = sr.ReadLine()) != null)
@@ -74,7 +73,7 @@ namespace JiebaNet.Segmenter
             }
             catch (IOException e)
             {
-                Debug.Fail(string.Format("{0} load failure, reason: {1}", MainDict, e.Message));
+                Debug.Fail(string.Format("dict.txt load failure, reason: {0}", e.Message));
             }
             catch (FormatException fe)
             {

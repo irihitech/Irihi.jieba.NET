@@ -38,7 +38,9 @@ jieba.NET是[jieba中文分词](https://github.com/fxsjy/jieba)的.NET版本（C
 PM> Install-Package jieba.NET
 ```
 
-安装之后，在packages\jieba.NET目录下可以看到Resources目录，这里面是jieba.NET运行所需的词典及其它数据文件，最简单的配置方法是将整个Resources目录拷贝到程序集所在目录，这样jieba.NET会使用内置的默认配置值。如果希望将这些文件放在其它位置，有两种配置方法：
+安装之后**无需任何配置**：jieba.NET 运行所需的词典及其它数据文件（dict.txt、HMM 模型等）已作为内嵌资源打包在程序集中，默认从内嵌资源直接加载，包括 Android/iOS 在内的所有平台开箱即用，也不依赖文件系统布局。
+
+如果希望使用自定义的词典数据（自定义词库、多应用共享词库目录等），可以指定一个自定义目录，此时 jieba.NET 会改为从该目录读取**全部**数据文件（dict.txt、prob_trans.json、idf.txt、stopwords.txt 等，可从仓库 src/Segmenter/Resources 获取）。有两种配置方法：
 
 ### 使用代码配置词典路径
 
@@ -61,7 +63,7 @@ set JIEBA_CONFIG_FILE_DIR=C:\jiebanet\config
 配置示例：
 
 * 采用绝对路径时，比如配置为C:\jiebanet\config，那么主词典的路径会拼接为：C:\jiebanet\config\dict.txt。
-* 采用相对路径时（或未做任何配置，那么将会使用默认的**相对路径：Resources**），比如配置为..\config（可通过..来调整相对路径），若应用程序目录是C:\myapp\bin\，那么主词典的路径会拼接为：C:\myapp\config\dict.txt。
+* 采用相对路径时，比如配置为..\config（可通过..来调整相对路径），若应用程序目录是C:\myapp\bin\，那么主词典的路径会拼接为：C:\myapp\config\dict.txt。
 
 > 说明：0.42.2及之前的版本通过app.config/web.config的appSettings项（键为JiebaConfigFileDir）来配置，该机制已被移除。库本身没有任何NuGet依赖（JSON模型加载使用框架内置的System.Text.Json源生成），net8.0及以上的应用可以在修剪（trimmed）或NativeAOT发布中使用jieba.NET。
 

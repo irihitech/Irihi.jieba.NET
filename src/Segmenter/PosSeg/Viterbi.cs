@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using JiebaNet.Segmenter.Common;
 
@@ -63,17 +62,13 @@ namespace JiebaNet.Segmenter.PosSeg
 
         private static void LoadModel()
         {
-            var startJson = File.ReadAllText(Path.GetFullPath(ConfigManager.PosProbStartFile));
-            _startProbs = JsonHelper.DeserializePosProbStart(startJson);
+            _startProbs = JsonHelper.DeserializePosProbStart(ConfigManager.ReadResourceText("pos_prob_start.json"));
 
-            var transJson = File.ReadAllText(Path.GetFullPath(ConfigManager.PosProbTransFile));
-            _transProbs = JsonHelper.DeserializePosProbTrans(transJson);
+            _transProbs = JsonHelper.DeserializePosProbTrans(ConfigManager.ReadResourceText("pos_prob_trans.json"));
 
-            var emitJson = File.ReadAllText(Path.GetFullPath(ConfigManager.PosProbEmitFile));
-            _emitProbs = JsonHelper.DeserializePosProbEmit(emitJson);
+            _emitProbs = JsonHelper.DeserializePosProbEmit(ConfigManager.ReadResourceText("pos_prob_emit.json"));
 
-            var tabJson = File.ReadAllText(Path.GetFullPath(ConfigManager.CharStateTabFile));
-            _stateTab = JsonHelper.DeserializeCharStateTab(tabJson);
+            _stateTab = JsonHelper.DeserializeCharStateTab(ConfigManager.ReadResourceText("char_state_tab.json"));
         }
 
         // TODO: change sentence to obs?
