@@ -8,13 +8,16 @@ using JiebaNet.Segmenter.Common;
 
 namespace JiebaNet.Segmenter.FinalSeg
 {
-    public class Viterbi : IFinalSeg
+    public partial class Viterbi : IFinalSeg
     {
         private static readonly Lazy<Viterbi> Lazy = new Lazy<Viterbi>(() => new Viterbi());
         private static readonly char[] States = { 'B', 'M', 'E', 'S' };
 
-        private static readonly Regex RegexChinese = new Regex(@"([\u4E00-\u9FD5]+)", RegexOptions.Compiled);
-        private static readonly Regex RegexSkip = new Regex(@"([a-zA-Z0-9]+(?:\.\d+)?%?)", RegexOptions.Compiled);
+        [GeneratedRegex(@"([\u4E00-\u9FD5]+)")]
+        private static partial Regex RegexChinese();
+
+        [GeneratedRegex(@"([a-zA-Z0-9]+(?:\.\d+)?%?)")]
+        private static partial Regex RegexSkip();
 
         private static IDictionary<char, IDictionary<char, double>> _emitProbs;
         private static IDictionary<char, double> _startProbs;
@@ -35,15 +38,15 @@ namespace JiebaNet.Segmenter.FinalSeg
         public IEnumerable<string> Cut(string sentence)
         {
             var tokens = new List<string>();
-            foreach (var blk in RegexChinese.Split(sentence))
+            foreach (var blk in RegexChinese().Split(sentence))
             {
-                if (RegexChinese.IsMatch(blk))
+                if (RegexChinese().IsMatch(blk))
                 {
                     tokens.AddRange(ViterbiCut(blk));
                 }
                 else
                 {
-                    var segments = RegexSkip.Split(blk).Where(seg => !string.IsNullOrEmpty(seg));
+                    var segments = RegexSkip().Split(blk).Where(seg => !string.IsNullOrEmpty(seg));
                     tokens.AddRange(segments);
                 }
             }

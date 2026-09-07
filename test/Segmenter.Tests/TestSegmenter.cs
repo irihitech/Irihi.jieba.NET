@@ -253,12 +253,12 @@ namespace JiebaNet.Segmenter.Tests
         public void TestSplit_Han_Default()
         {
             var s = "IBM是一家不错的公司，给你发offer了吗？";
-            foreach (var part in JiebaSegmenter.RegexChineseDefault.Split(s))
+            foreach (var part in JiebaSegmenter.RegexChineseDefault().Split(s))
             {
                 Console.WriteLine(part);
             }
 
-            foreach (var part in JiebaSegmenter.RegexChineseCutAll.Split(s))
+            foreach (var part in JiebaSegmenter.RegexChineseCutAll().Split(s))
             {
                 Console.WriteLine(part);
             }

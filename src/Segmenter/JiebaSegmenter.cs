@@ -10,7 +10,7 @@ using JiebaNet.Segmenter.FinalSeg;
 
 namespace JiebaNet.Segmenter
 {
-    public class JiebaSegmenter
+    public partial class JiebaSegmenter
     {
         private static readonly WordDictionary WordDict = WordDictionary.Instance;
         private static readonly IFinalSeg FinalSeg = Viterbi.Instance;
@@ -22,16 +22,20 @@ namespace JiebaNet.Segmenter
 
         #region Regular Expressions
 
-        internal static readonly Regex RegexChineseDefault = new Regex(@"([\u4E00-\u9FD5a-zA-Z0-9+#&\._%·\-]+)", RegexOptions.Compiled);
+        [GeneratedRegex(@"([\u4E00-\u9FD5a-zA-Z0-9+#&\._%·\-]+)")]
+        internal static partial Regex RegexChineseDefault();
 
-        internal static readonly Regex RegexSkipDefault = new Regex(@"(\r\n|\s)", RegexOptions.Compiled);
+        [GeneratedRegex(@"(\r\n|\s)")]
+        internal static partial Regex RegexSkipDefault();
 
-        internal static readonly Regex RegexChineseCutAll = new Regex(@"([\u4E00-\u9FD5]+)", RegexOptions.Compiled);
-        internal static readonly Regex RegexSkipCutAll = new Regex(@"[^a-zA-Z0-9+#\n]", RegexOptions.Compiled);
+        [GeneratedRegex(@"([\u4E00-\u9FD5]+)")]
+        internal static partial Regex RegexChineseCutAll();
 
-        internal static readonly Regex RegexEnglishChars = new Regex(@"[a-zA-Z0-9]", RegexOptions.Compiled);
+        [GeneratedRegex(@"[^a-zA-Z0-9+#\n]")]
+        internal static partial Regex RegexSkipCutAll();
 
-        internal static readonly Regex RegexUserDict = new Regex("^(?<word>.+?)(?<freq> [0-9]+)?(?<tag> [a-z]+)?$", RegexOptions.Compiled);
+        [GeneratedRegex("^(?<word>.+?)(?<freq> [0-9]+)?(?<tag> [a-z]+)?$")]
+        private static partial Regex RegexUserDict();
 
         #endregion
 
@@ -50,16 +54,16 @@ namespace JiebaNet.Segmenter
         /// <returns></returns>
         public IEnumerable<string> Cut(string text, bool cutAll = false, bool hmm = true)
         {
-            var reHan = cutAll ? RegexChineseCutAll : RegexChineseDefault;
-            var reSkip = cutAll ? RegexSkipCutAll : RegexSkipDefault;
+            var reHan = cutAll ? RegexChineseCutAll() : RegexChineseDefault();
+            var reSkip = cutAll ? RegexSkipCutAll() : RegexSkipDefault();
             var cutMethod = cutAll ? CutAll : hmm ? CutDag : (Func<string, IEnumerable<string>>)CutDagWithoutHmm;
             return CutIt(text, cutMethod, reHan, reSkip, cutAll);
         }
-        
+
         public IEnumerable<IEnumerable<string>> CutInParallel(IEnumerable<string> texts, bool cutAll = false, bool hmm = true)
         {
-            var reHan = cutAll ? RegexChineseCutAll : RegexChineseDefault;
-            var reSkip = cutAll ? RegexSkipCutAll : RegexSkipDefault;
+            var reHan = cutAll ? RegexChineseCutAll() : RegexChineseDefault();
+            var reSkip = cutAll ? RegexSkipCutAll() : RegexSkipDefault();
             var cutMethod = cutAll ? CutAll : hmm ? CutDag : (Func<string, IEnumerable<string>>)CutDagWithoutHmm;
 
             return texts.AsParallel().AsOrdered().Select(text => CutIt(text, cutMethod, reHan, reSkip, cutAll));
@@ -427,7 +431,7 @@ namespace JiebaNet.Segmenter
                             continue;
                         }
 
-                        var tokens = RegexUserDict.Match(line.Trim()).Groups;
+                        var tokens = RegexUserDict().Match(line.Trim()).Groups;
                         var word = tokens["word"].Value.Trim();
                         var freq = tokens["freq"].Value.Trim();
                         var tag = tokens["tag"].Value.Trim();
