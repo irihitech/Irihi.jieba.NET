@@ -9,7 +9,7 @@ using JiebaNet.Segmenter.Common;
 
 namespace JiebaNet.Segmenter.PosSeg
 {
-    public class PosSegmenter
+    public partial class PosSegmenter
     {
         private static readonly WordDictionary WordDict = WordDictionary.Instance;
         private static readonly Viterbi PosSeg = Viterbi.Instance;
@@ -19,16 +19,26 @@ namespace JiebaNet.Segmenter.PosSeg
 
         #region Regular Expressions
 
-        internal static readonly Regex RegexChineseInternal = new Regex(@"([\u4E00-\u9FD5a-zA-Z0-9+#&\._%·\-]+)", RegexOptions.Compiled);
-        internal static readonly Regex RegexSkipInternal = new Regex(@"(\r\n|\s)", RegexOptions.Compiled);
+        [GeneratedRegex(@"([\u4E00-\u9FD5a-zA-Z0-9+#&\._%·\-]+)")]
+        internal static partial Regex RegexChineseInternal();
 
-        internal static readonly Regex RegexChineseDetail = new Regex(@"([\u4E00-\u9FD5]+)", RegexOptions.Compiled);
-        internal static readonly Regex RegexSkipDetail = new Regex(@"([\.0-9]+|[a-zA-Z0-9]+)", RegexOptions.Compiled);
+        [GeneratedRegex(@"(\r\n|\s)")]
+        internal static partial Regex RegexSkipInternal();
 
-        internal static readonly Regex RegexEnglishWords = new Regex(@"[a-zA-Z0-9]+", RegexOptions.Compiled);
-        internal static readonly Regex RegexNumbers = new Regex(@"[\.0-9]+", RegexOptions.Compiled);
+        [GeneratedRegex(@"([\u4E00-\u9FD5]+)")]
+        internal static partial Regex RegexChineseDetail();
 
-        internal static readonly Regex RegexEnglishChar = new Regex(@"^[a-zA-Z0-9]$", RegexOptions.Compiled);
+        [GeneratedRegex(@"([\.0-9]+|[a-zA-Z0-9]+)")]
+        internal static partial Regex RegexSkipDetail();
+
+        [GeneratedRegex(@"[a-zA-Z0-9]+")]
+        private static partial Regex RegexEnglishWords();
+
+        [GeneratedRegex(@"[\.0-9]+")]
+        private static partial Regex RegexNumbers();
+
+        [GeneratedRegex(@"^[a-zA-Z0-9]$")]
+        private static partial Regex RegexEnglishChar();
 
         #endregion
 
@@ -116,7 +126,7 @@ namespace JiebaNet.Segmenter.PosSeg
         {
             CheckNewUserWordTags();
 
-            var blocks = RegexChineseInternal.Split(text);
+            var blocks = RegexChineseInternal().Split(text);
             Func<string, IEnumerable<Pair>> cutMethod = null;
             if (hmm)
             {
@@ -130,16 +140,16 @@ namespace JiebaNet.Segmenter.PosSeg
             var tokens = new List<Pair>();
             foreach (var blk in blocks)
             {
-                if (RegexChineseInternal.IsMatch(blk))
+                if (RegexChineseInternal().IsMatch(blk))
                 {
                     tokens.AddRange(cutMethod(blk));
                 }
                 else
                 {
-                    var tmp = RegexSkipInternal.Split(blk);
+                    var tmp = RegexSkipInternal().Split(blk);
                     foreach (var x in tmp)
                     {
-                        if (RegexSkipInternal.IsMatch(x))
+                        if (RegexSkipInternal().IsMatch(x))
                         {
                             tokens.Add(new Pair(x, "x"));
                         }
@@ -149,11 +159,11 @@ namespace JiebaNet.Segmenter.PosSeg
                             {
                                 // TODO: each char?
                                 var xxs = xx.ToString();
-                                if (RegexNumbers.IsMatch(xxs))
+                                if (RegexNumbers().IsMatch(xxs))
                                 {
                                     tokens.Add(new Pair(xxs, "m"));
                                 }
-                                else if (RegexEnglishWords.IsMatch(x))
+                                else if (RegexEnglishWords().IsMatch(x))
                                 {
                                     tokens.Add(new Pair(xxs, "eng"));
                                 }
@@ -225,7 +235,7 @@ namespace JiebaNet.Segmenter.PosSeg
                 y = route[x].Key + 1;
                 var w = sentence.Substring(x, y - x);
                 // TODO: char or word?
-                if (RegexEnglishChar.IsMatch(w))
+                if (RegexEnglishChar().IsMatch(w))
                 {
                     buf += w;
                     x = y;
@@ -253,25 +263,25 @@ namespace JiebaNet.Segmenter.PosSeg
         internal IEnumerable<Pair> CutDetail(string text)
         {
             var tokens = new List<Pair>();
-            var blocks = RegexChineseDetail.Split(text);
+            var blocks = RegexChineseDetail().Split(text);
             foreach (var blk in blocks)
             {
-                if (RegexChineseDetail.IsMatch(blk))
+                if (RegexChineseDetail().IsMatch(blk))
                 {
                     tokens.AddRange(PosSeg.Cut(blk));
                 }
                 else
                 {
-                    var tmp = RegexSkipDetail.Split(blk);
+                    var tmp = RegexSkipDetail().Split(blk);
                     foreach (var x in tmp)
                     {
                         if (!string.IsNullOrWhiteSpace(x))
                         {
-                            if (RegexNumbers.IsMatch(x))
+                            if (RegexNumbers().IsMatch(x))
                             {
                                 tokens.Add(new Pair(x, "m"));
                             }
-                            else if(RegexEnglishWords.IsMatch(x))
+                            else if(RegexEnglishWords().IsMatch(x))
                             {
                                 tokens.Add(new Pair(x, "eng"));
                             }

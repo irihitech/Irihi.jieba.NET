@@ -5,10 +5,10 @@ using System.Text.RegularExpressions;
 
 namespace JiebaNet.Segmenter.Common
 {
-    public static class Extensions
+    public static partial class Extensions
     {
-        private static readonly Regex RegexDigits = new Regex(@"\d+", RegexOptions.Compiled);
-        private static readonly Regex RegexNewline = new Regex("(\r\n|\n|\r)", RegexOptions.Compiled);
+        [GeneratedRegex(@"\d+")]
+        private static partial Regex RegexDigits();
 
         #region Objects
 
@@ -100,7 +100,7 @@ namespace JiebaNet.Segmenter.Common
 
         public static bool IsInt32(this string s)
         {
-            return RegexDigits.IsMatch(s);
+            return RegexDigits().IsMatch(s);
         }
         
         public static string[] SplitLines(this string s)
