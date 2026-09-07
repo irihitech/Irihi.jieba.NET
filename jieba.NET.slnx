@@ -8,4 +8,8 @@
     <Project Path="test/NativeAotSmokeTest/NativeAotSmokeTest.csproj" />
     <Project Path="test/Segmenter.Tests/Segmenter.Tests.csproj" />
   </Folder>
+  <Folder Name="/benchmark/">
+    <Project Path="benchmark/JiebaNet.ForkBench/JiebaNet.ForkBench.csproj" />
+    <Project Path="benchmark/JiebaNet.UpstreamBench/JiebaNet.UpstreamBench.csproj" />
+  </Folder>
 </Solution>
