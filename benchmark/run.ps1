@@ -111,7 +111,17 @@ if ($forkCsv -and $upstreamCsv)
 
     Write-Host ""
     Write-Host "===== Comparison (BDN Mean; ratio > 1 means the fork is faster) =====" -ForegroundColor Green
-    $rows | Sort-Object "Scenario" | Format-Table -AutoSize | Out-Host
+
+    $lines = @()
+    $lines += "| Scenario | fork (ms) | upstream (ms) | upstream / fork | fork alloc | upstream alloc |"
+    $lines += "|---|---:|---:|---:|---:|---:|"
+    foreach ($row in ($rows | Sort-Object "upstream / fork" -Descending))
+    {
+        $scenario = ($row.Scenario -replace "^'", "") -replace "'$", ""
+        $lines += "| $scenario | $($row.'fork ms') | $($row.'upstream ms') | $($row.'upstream / fork') | $($row.'fork alloc') | $($row.'upstream alloc') |"
+    }
+
+    $lines | Out-Host
 }
 else
 {
