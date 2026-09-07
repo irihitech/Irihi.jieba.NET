@@ -1,5 +1,13 @@
 jieba.NET是[jieba中文分词](https://github.com/fxsjy/jieba)的.NET版本（C#实现）。
 
+## 关于本 Fork
+
+本仓库是 [anderscui/jieba.NET](https://github.com/anderscui/jieba.NET) 的 fork，为以下目标而维护：
+
+1. **移除旧的 TFM**：不再支持 netstandard2.0/net40/net45，仅保留 net8.0 与 net10.0；
+2. **支持 NativeAOT**：配置与 JSON 模型加载全面现代化（System.Text.Json 源生成、零 NuGet 依赖），可在 trimmed / NativeAOT 发布的应用中直接使用；
+3. **支持 Mantra RubyText 项目**：为其提供跨平台的中文分词能力。
+
 当前版本为0.42.2，基于jieba 0.42，提供与jieba**基本一致**的功能与接口，但不支持其最新的paddle模式。关于jieba的实现思路，可以看看[这篇wiki](https://github.com/anderscui/jieba.NET/wiki/%E7%90%86%E8%A7%A3%E7%BB%93%E5%B7%B4%E5%88%86%E8%AF%8D)里提到的资料。
 
 此外，也提供了 `KeywordProcessor`，参考 [FlashText](https://github.com/vi3k6i5/flashtext) 实现。`KeywordProcessor` 可以更灵活地从文本中提取**词典中的关键词**，比如忽略大小写、含空格的词等。
