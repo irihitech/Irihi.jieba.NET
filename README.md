@@ -24,7 +24,7 @@ jieba.NET是[jieba中文分词](https://github.com/fxsjy/jieba)的.NET版本（C
 
 ## 安装和配置
 
-当前版本支持net40、net45和netstandard2.0，可以手动引用项目，也可以通过NuGet添加引用：
+当前版本支持net8.0和net10.0，可以手动引用项目，也可以通过NuGet添加引用：
 
 ```shell
 PM> Install-Package jieba.NET
@@ -55,7 +55,7 @@ set JIEBA_CONFIG_FILE_DIR=C:\jiebanet\config
 * 采用绝对路径时，比如配置为C:\jiebanet\config，那么主词典的路径会拼接为：C:\jiebanet\config\dict.txt。
 * 采用相对路径时（或未做任何配置，那么将会使用默认的**相对路径：Resources**），比如配置为..\config（可通过..来调整相对路径），若应用程序目录是C:\myapp\bin\，那么主词典的路径会拼接为：C:\myapp\config\dict.txt。
 
-> 说明：0.42.2及之前的版本通过app.config/web.config的appSettings项（键为JiebaConfigFileDir）来配置，该机制已被移除。现代.NET（6及以上）的应用可以在修剪（trimmed）或NativeAOT发布中使用jieba.NET，分词所需的HMM模型通过System.Text.Json源生成加载，不依赖反射。
+> 说明：0.42.2及之前的版本通过app.config/web.config的appSettings项（键为JiebaConfigFileDir）来配置，该机制已被移除。库本身没有任何NuGet依赖（JSON模型加载使用框架内置的System.Text.Json源生成），net8.0及以上的应用可以在修剪（trimmed）或NativeAOT发布中使用jieba.NET。
 
 ## 主要功能
 

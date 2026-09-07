@@ -1,6 +1,4 @@
 using System.Collections.Generic;
-
-#if NETSTANDARD2_0
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -47,37 +45,3 @@ namespace JiebaNet.Segmenter.Common
     {
     }
 }
-#else
-using Newtonsoft.Json;
-
-namespace JiebaNet.Segmenter.Common
-{
-    internal static class JsonHelper
-    {
-        public static IDictionary<char, IDictionary<char, double>> DeserializeProbTable(string json)
-        {
-            return JsonConvert.DeserializeObject<IDictionary<char, IDictionary<char, double>>>(json);
-        }
-
-        public static IDictionary<string, double> DeserializePosProbStart(string json)
-        {
-            return JsonConvert.DeserializeObject<IDictionary<string, double>>(json);
-        }
-
-        public static IDictionary<string, IDictionary<string, double>> DeserializePosProbTrans(string json)
-        {
-            return JsonConvert.DeserializeObject<IDictionary<string, IDictionary<string, double>>>(json);
-        }
-
-        public static IDictionary<string, IDictionary<char, double>> DeserializePosProbEmit(string json)
-        {
-            return JsonConvert.DeserializeObject<IDictionary<string, IDictionary<char, double>>>(json);
-        }
-
-        public static IDictionary<char, List<string>> DeserializeCharStateTab(string json)
-        {
-            return JsonConvert.DeserializeObject<IDictionary<char, List<string>>>(json);
-        }
-    }
-}
-#endif

@@ -32,17 +32,7 @@ namespace JiebaNet.Segmenter
             set { _configFileBaseDir = value; }
         }
 
-        private static string BaseDirectory
-        {
-            get
-            {
-#if NETSTANDARD2_0
-                return AppContext.BaseDirectory;
-#else
-                return AppDomain.CurrentDomain.BaseDirectory;
-#endif
-            }
-        }
+        private static string BaseDirectory => AppContext.BaseDirectory;
 
         public static string MainDictFile
         {
