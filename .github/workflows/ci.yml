@@ -32,3 +32,32 @@ jobs:
 
       - name: Pack (validate package)
         run: dotnet pack src/Segmenter/Segmenter.csproj -c Release --no-build -o artifacts
+
+  nativeaot:
+    name: NativeAOT smoke (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            rid: linux-x64
+            exe: JiebaNet.NativeAotSmokeTest
+          - os: windows-latest
+            rid: win-x64
+            exe: JiebaNet.NativeAotSmokeTest.exe
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Publish (NativeAOT)
+        run: dotnet publish test/NativeAotSmokeTest/NativeAotSmokeTest.csproj -c Release -r ${{ matrix.rid }}
+
+      - name: Smoke test
+        run: test/NativeAotSmokeTest/bin/Release/net10.0/${{ matrix.rid }}/publish/${{ matrix.exe }}
