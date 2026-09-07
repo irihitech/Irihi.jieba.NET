@@ -200,3 +200,4 @@ FakesAssemblies/
 _bin/
 _Nuget/NuGet.exe
 snks/*.snk
+BenchmarkDotNet.Artifacts/
