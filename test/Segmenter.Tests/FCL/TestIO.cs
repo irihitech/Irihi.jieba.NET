@@ -50,8 +50,22 @@ namespace JiebaNet.Segmenter.Tests.FCL
         [TestCase]
         public void TestReadFilePerf()
         {
-            ReadLines(TestHelper.GetResourceFilePath("dict.txt"));
-            ReadStreamReader(TestHelper.GetResourceFilePath("dict.txt"));
+            var tempFile = Path.Combine(Path.GetTempPath(), "jieba-dict-" + Guid.NewGuid().ToString("N") + ".txt");
+            try
+            {
+                using (var stream = ConfigManager.OpenResource("dict.txt"))
+                using (var fileStream = File.Create(tempFile))
+                {
+                    stream.CopyTo(fileStream);
+                }
+
+                ReadLines(tempFile);
+                ReadStreamReader(tempFile);
+            }
+            finally
+            {
+                File.Delete(tempFile);
+            }
         }
 
         private void ReadLines(string filePath)

@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Text;
 using NUnit.Framework;
 
 namespace JiebaNet.Segmenter.Tests
@@ -27,23 +28,29 @@ namespace JiebaNet.Segmenter.Tests
         [TestCase]
         public void TestCustomDirPrefersFiles()
         {
-            var resourcesDir = Path.Combine(AppContext.BaseDirectory, "Resources");
+            var tempDir = Path.Combine(Path.GetTempPath(), "jieba-test-" + Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(tempDir);
             try
             {
-                ConfigManager.ConfigFileBaseDir = resourcesDir;
+                File.WriteAllText(Path.Combine(tempDir, "dict.txt"), "测试 100\n", Encoding.UTF8);
+
+                ConfigManager.ConfigFileBaseDir = tempDir;
                 Assert.That(ConfigManager.HasCustomConfigFileDir, Is.True);
+                Assert.That(ConfigManager.MainDictFile, Is.EqualTo(Path.Combine(tempDir, "dict.txt")));
 
                 using (var stream = ConfigManager.OpenResource("dict.txt"))
                 {
                     Assert.That(stream, Is.InstanceOf<FileStream>());
+                    using (var reader = new StreamReader(stream, Encoding.UTF8))
+                    {
+                        Assert.That(reader.ReadLine(), Is.EqualTo("测试 100"));
+                    }
                 }
-
-                var text = ConfigManager.ReadResourceText("idf.txt");
-                Assert.That(text, Is.Not.Empty);
             }
             finally
             {
                 ConfigManager.ConfigFileBaseDir = null;
+                Directory.Delete(tempDir, true);
             }
         }
     }
