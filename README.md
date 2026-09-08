@@ -32,10 +32,10 @@ jieba.NET是[jieba中文分词](https://github.com/fxsjy/jieba)的.NET版本（C
 
 ## 安装和配置
 
-当前版本支持net8.0和net10.0，可以手动引用项目，也可以通过NuGet添加引用：
+当前版本支持net8.0和net10.0，可以手动引用项目，也可以通过NuGet添加引用（`JiebaNet.Segmenter` 与 `JiebaNet.Analyser` 打包在同一个包中）：
 
 ```shell
-PM> Install-Package jieba.NET
+PM> Install-Package Irihi.JiebaNet
 ```
 
 安装之后**无需任何配置**：jieba.NET 运行所需的词典及其它数据文件（dict.txt、HMM 模型等）已作为内嵌资源打包在程序集中，默认从内嵌资源直接加载，包括 Android/iOS 在内的所有平台开箱即用，也不依赖文件系统布局。

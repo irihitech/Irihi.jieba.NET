@@ -31,7 +31,7 @@ jobs:
         run: dotnet test jieba.NET.slnx -c Release --no-build
 
       - name: Pack (validate package)
-        run: dotnet pack src/Segmenter/Segmenter.csproj -c Release --no-build -o artifacts
+        run: dotnet pack src/JiebaNet.Package/JiebaNet.Package.csproj -c Release --no-build -o artifacts
 
   nativeaot:
     name: NativeAOT smoke (${{ matrix.os }})
