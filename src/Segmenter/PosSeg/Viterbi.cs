@@ -7,7 +7,7 @@ namespace JiebaNet.Segmenter.PosSeg;
 
 public class Viterbi
 {
-    private static readonly Lazy<Viterbi> Lazy = new Lazy<Viterbi>(() => new Viterbi());
+    private static readonly Lazy<Viterbi> Lazy = new(() => new Viterbi());
 
     private static IDictionary<string, double> _startProbs;
     private static IDictionary<string, IDictionary<string, double>> _transProbs;

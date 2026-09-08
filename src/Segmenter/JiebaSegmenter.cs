@@ -16,7 +16,7 @@ public partial class JiebaSegmenter
     private static readonly IFinalSeg FinalSeg = Viterbi.Instance;
     private static readonly ISet<string> LoadedPath = new HashSet<string>();
 
-    private static readonly object locker = new object();
+    private static readonly object locker = new();
 
     internal IDictionary<string, string> UserWordTagTab { get; set; }
 

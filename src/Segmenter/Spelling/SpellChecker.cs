@@ -34,7 +34,7 @@ public class SpellChecker : ISpellChecker
                     var first = wd.Key[0];
                     if (!FirstChars.ContainsKey(second))
                     {
-                        FirstChars[second] = new HashSet<char>();
+                        FirstChars[second] = [];
                     }
                     FirstChars[second].Add(first);
                 }
@@ -136,7 +136,7 @@ public class SpellChecker : ISpellChecker
     {
         if (WordDict.ContainsWord(word))
         {
-            return new[] {word};
+            return [word];
         }
 
         var candicates = GetKnownWords(GetEdits1(word));

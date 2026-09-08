@@ -11,7 +11,7 @@ public class ConfigManager
 
     private const string EmbeddedResourcePrefix = "JiebaNet.Segmenter.Resources.";
 
-    private static string _customConfigFileBaseDir = null;
+    private static string? _customConfigFileBaseDir = null;
 
     /// <summary>
     /// Custom directory of the dictionary and model files. When it is set (or the

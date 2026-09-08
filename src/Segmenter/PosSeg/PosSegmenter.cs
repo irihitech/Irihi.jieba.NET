@@ -15,7 +15,7 @@ public partial class PosSegmenter
     private static readonly Viterbi PosSeg = Viterbi.Instance;
 
     // TODO: 
-    private static readonly object locker = new object();
+    private static readonly object locker = new();
 
     #region Regular Expressions
 

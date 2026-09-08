@@ -54,7 +54,7 @@ public interface ICounter<T>
 
 public class Counter<T>: ICounter<T>
 {
-    private Dictionary<T, int> data = new Dictionary<T, int>();
+    private Dictionary<T, int> data = new();
 
     public Counter() {}
 

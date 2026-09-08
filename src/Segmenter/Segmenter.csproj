@@ -8,6 +8,7 @@
     <Description>JiebaNet.Segmenter.</Description>
     <Company>andersc</Company>
     <Authors>andersc</Authors>
+    <Nullable>enable</Nullable>
     <Copyright>Copyright © andersc 2020</Copyright>
     <RepositoryUrl>https://github.com/anderscui/jieba.NET/</RepositoryUrl>
   </PropertyGroup>

@@ -11,7 +11,7 @@ public class TestKeywordProcessor
     private KeywordProcessor GetSimpleProcessor()
     {
         var kp = new KeywordProcessor();
-        kp.AddKeywords(new []{".NET Core", "Java", "C语言", "字典 tree", "CET-4", "网络 编程"});
+        kp.AddKeywords([".NET Core", "Java", "C语言", "字典 tree", "CET-4", "网络 编程"]);
         return kp;
     }
         
@@ -32,7 +32,7 @@ public class TestKeywordProcessor
         var kp = new KeywordProcessor();
         kp.AddKeyword(".net core");
         kp.AddKeyword("C# 8.0");
-        kp.AddKeywords(new []{"C# 7.0", "C# 8.0"});
+        kp.AddKeywords(["C# 7.0", "C# 8.0"]);
             
         var keywords = kp.ExtractKeywords("I am learning .net core and c# 8.0");
         var expected = new List<string> { ".net core", "C# 8.0"};
@@ -42,7 +42,7 @@ public class TestKeywordProcessor
         kp.RemoveKeyword("C# 8.0");
         Assert.That(kp.Contains("C# 8.0"), Is.False);
         keywords = kp.ExtractKeywords("I am learning .net core and c# 8.0");
-        expected = new List<string> { ".net core"};
+        expected = [".net core"];
         CollectionAssert.AreEqual(expected, keywords);
     }
 
@@ -50,7 +50,7 @@ public class TestKeywordProcessor
     public void TestExtract()
     {
         var kp = new KeywordProcessor();
-        kp.AddKeywords(new []{"Big Apple", "Bay Area"});
+        kp.AddKeywords(["Big Apple", "Bay Area"]);
         var keywords = kp.ExtractKeywords("I love Big Apple and Bay Area.");
         var expected = new List<string> { "Big Apple", "Bay Area"};
         CollectionAssert.AreEqual(expected, keywords);
@@ -60,9 +60,9 @@ public class TestKeywordProcessor
     public void TestExtractSpans()
     {
         var kp = new KeywordProcessor();
-        kp.AddKeywords(new []{"Big Apple", "Bay Area"});
+        kp.AddKeywords(["Big Apple", "Bay Area"]);
         var keywords = kp.ExtractKeywordSpans("I love Big Apple and Bay Area.");
-        var expected = new List<TextSpan> { new TextSpan("Big Apple", 7, 16), new TextSpan("Bay Area", 21, 29)};
+        var expected = new List<TextSpan> { new("Big Apple", 7, 16), new("Bay Area", 21, 29)};
         CollectionAssert.AreEqual(expected, keywords);
     }
         
@@ -85,7 +85,7 @@ public class TestKeywordProcessor
         CollectionAssert.AreEqual(expected, keywords);
             
         keywords = kp.ExtractKeywords(".net core");
-        expected = new List<string> { ".NET Core"};
+        expected = [".NET Core"];
         CollectionAssert.AreEqual(expected, keywords);
     }
         

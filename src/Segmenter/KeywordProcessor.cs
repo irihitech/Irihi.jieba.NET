@@ -9,7 +9,7 @@ public class KeywordProcessor
     // private readonly string _keyword = "_keyword_";
     // private readonly ISet<char> _whiteSpaceChars = new HashSet<char>(".\t\n\a ,");
     // private readonly bool CaseSensitive;
-    private readonly KeywordTrie KeywordTrie = new KeywordTrie();
+    private readonly KeywordTrie KeywordTrie = new();
 
     private readonly ISet<char> NonWordBoundries =
         new HashSet<char>("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_");

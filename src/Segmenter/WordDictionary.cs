@@ -8,7 +8,7 @@ namespace JiebaNet.Segmenter;
 
 public class WordDictionary
 {
-    private static readonly Lazy<WordDictionary> lazy = new Lazy<WordDictionary>(() => new WordDictionary());
+    private static readonly Lazy<WordDictionary> lazy = new(() => new WordDictionary());
 
     internal IDictionary<string, int> Trie = new Dictionary<string, int>();
 
@@ -17,14 +17,14 @@ public class WordDictionary
     /// kept in sync by <see cref="AddWord(string, int, string)"/>; used by the
     /// segmentation hot path to avoid substring allocations.
     /// </summary>
-    internal WordDictIndex Index { get; } = new WordDictIndex();
+    internal WordDictIndex Index { get; } = new();
 
     /// <summary>
     /// total occurrence of all words.
     /// </summary>
     public double Total { get; set; }
 
-    private readonly List<int> _indexPath = new List<int>(16);
+    private readonly List<int> _indexPath = new(16);
 
     private WordDictionary()
     {

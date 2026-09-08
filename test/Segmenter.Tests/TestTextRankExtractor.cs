@@ -27,7 +27,7 @@ public class TestTextRankExtractor
         var result = extractor.ExtractTags(s);
         Assert.That(result, Contains.Item("吉林"));
 
-        result = extractor.ExtractTags(s, allowPos: new []{ "n" });
+        result = extractor.ExtractTags(s, allowPos: ["n"]);
         Assert.That(result, Is.Not.Contains("吉林"));
         Assert.That(result, Is.Not.Contains("实现"));
     }

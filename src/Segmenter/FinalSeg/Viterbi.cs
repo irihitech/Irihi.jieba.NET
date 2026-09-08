@@ -9,18 +9,18 @@ namespace JiebaNet.Segmenter.FinalSeg;
 
 public partial class Viterbi : IFinalSeg
 {
-    private static readonly Lazy<Viterbi> Lazy = new Lazy<Viterbi>(() => new Viterbi());
+    private static readonly Lazy<Viterbi> Lazy = new(() => new Viterbi());
 
     // State order used by every array below: B = 0, M = 1, E = 2, S = 3.
-    private static readonly char[] States = { 'B', 'M', 'E', 'S' };
+    private static readonly char[] States = ['B', 'M', 'E', 'S'];
 
     private static readonly int[][] PrevStatusIndexes =
-    {
-        new[] { 2, 3 },  // B <- E, S
-        new[] { 1, 0 },  // M <- M, B
-        new[] { 0, 1 },  // E <- B, M
-        new[] { 3, 2 },  // S <- S, E
-    };
+    [
+        [2, 3],  // B <- E, S
+        [1, 0],  // M <- M, B
+        [0, 1],  // E <- B, M
+        [3, 2] // S <- S, E
+    ];
 
     [GeneratedRegex(@"([\u4E00-\u9FD5]+)")]
     private static partial Regex RegexChinese();
@@ -68,13 +68,13 @@ public partial class Viterbi : IFinalSeg
         var stopWatch = new Stopwatch();
         stopWatch.Start();
 
-        _startProbs = new[]
-        {
+        _startProbs =
+        [
             -0.26268660809250016,  // B
             -3.14e+100,            // M
             -3.14e+100,            // E
             -1.4652633398537678    // S
-        };
+        ];
 
         var transJson = ConfigManager.ReadResourceText("prob_trans.json");
         var transTable = JsonHelper.DeserializeProbTable(transJson);

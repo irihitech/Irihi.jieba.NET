@@ -42,7 +42,7 @@ internal sealed class WordDictIndex
     {
         _nodes = new List<WordDictNode>(1 << 20)
         {
-            new WordDictNode { Char = '\0', Freq = 0, LogFreq = 0, FirstChild = -1, NextSibling = -1, ChildCount = 0, DictIndex = -1 }
+            new() { Char = '\0', Freq = 0, LogFreq = 0, FirstChild = -1, NextSibling = -1, ChildCount = 0, DictIndex = -1 }
         };
         _childrenDicts = new List<Dictionary<char, int>>();
     }
