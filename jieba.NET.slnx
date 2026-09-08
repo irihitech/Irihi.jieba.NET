@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/Analyser/Analyser.csproj" />
+    <Project Path="src/JiebaNet.Package/JiebaNet.Package.csproj" />
     <Project Path="src/Segmenter.Cli/Segmenter.Cli.csproj" />
     <Project Path="src/Segmenter/Segmenter.csproj" />
   </Folder>

@@ -1,0 +1,52 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Meta project that packs JiebaNet.Segmenter and JiebaNet.Analyser into a
+    single NuGet package. It has no code of its own: the referenced
+    assemblies are pulled into the package lib folder by the
+    CopyProjectReferencesToPackage target below, and the referenced projects
+    are IsPackable=false so they do not appear as package dependencies.
+  -->
+
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
+    <PackageId>Irihi.JiebaNet</PackageId>
+    <Version>0.42.2</Version>
+    <Authors>irihitech</Authors>
+    <Company>IRIHI Technology</Company>
+    <Product>Irihi.JiebaNet</Product>
+    <Description>Chinese words segmentation and keyword extraction (jieba.NET fork). Ships JiebaNet.Segmenter and JiebaNet.Analyser in a single package.</Description>
+    <PackageTags>jieba;chinese;segmentation;nlp;avalonia</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageIcon>irihi.png</PackageIcon>
+    <RepositoryUrl>https://github.com/irihitech/Irihi.jieba.NET</RepositoryUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="README.md" />
+    <None Include="..\..\irihi.png" Pack="true" PackagePath="irihi.png" />
+  </ItemGroup>
+
+  <!--
+    The two library assemblies are packaged explicitly from the referenced
+    projects' build output; dotnet pack builds project references before
+    packing, so the files exist by then. Physical lib/netX.Y folders are what
+    NuGet uses to match a consumer's target framework.
+  -->
+  <ItemGroup>
+    <None Include="..\Segmenter\bin\$(Configuration)\net8.0\JiebaNet.Segmenter.dll" Pack="true" PackagePath="lib/net8.0/" />
+    <None Include="..\Analyser\bin\$(Configuration)\net8.0\JiebaNet.Analyser.dll" Pack="true" PackagePath="lib/net8.0/" />
+    <None Include="..\Segmenter\bin\$(Configuration)\net10.0\JiebaNet.Segmenter.dll" Pack="true" PackagePath="lib/net10.0/" />
+    <None Include="..\Analyser\bin\$(Configuration)\net10.0\JiebaNet.Analyser.dll" Pack="true" PackagePath="lib/net10.0/" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Analyser\Analyser.csproj" PrivateAssets="all" />
+    <ProjectReference Include="..\Segmenter\Segmenter.csproj" PrivateAssets="all" />
+  </ItemGroup>
+
+</Project>
