@@ -158,7 +158,7 @@ public class TestSegmenter
         Assert.That(segments, Is.Not.Contains("机器"));
 
         // reset dict otherwise other test cases would be affected.
-        seg.DeleteWord("机器学习");
+        JiebaSegmenter.DeleteWord("机器学习");
     }
 
     [TestCase]
@@ -176,7 +176,7 @@ public class TestSegmenter
         Assert.That(segments, Contains.Item("机器学习"));
         Assert.That(segments, Is.Not.Contains("机器"));
 
-        seg.DeleteWord("机器学习");
+        JiebaSegmenter.DeleteWord("机器学习");
         segments = seg.Cut(s);
         Assert.That(segments, Contains.Item("机器"));
         Assert.That(segments, Is.Not.Contains("机器学习"));
@@ -351,7 +351,7 @@ public class TestSegmenter
     public void TestIssue46()
     {
         var seg = new JiebaSegmenter();
-        seg.DeleteWord("天半");
+        JiebaSegmenter.DeleteWord("天半");
             
         var segments = seg.CutAll("2天半").ToList();
         Assert.That(segments, Contains.Item("天"));

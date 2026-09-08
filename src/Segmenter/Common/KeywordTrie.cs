@@ -112,19 +112,8 @@ public class KeywordTrie: KeywordTrieNode
     #endregion
 }
     
-public record TextSpan
+public record TextSpan(string Text, int Start, int End)
 {
-    public string Text { get; }
-    public int Start { get; }
-    public int End { get; }
-
-    public TextSpan(string text, int start, int end)
-    {
-        Text = text;
-        Start = start;
-        End = end;
-    }
-    
     public override string ToString()
     {
         return $"<{Text}({Start}, {End})>";

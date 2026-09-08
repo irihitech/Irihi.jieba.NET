@@ -8,22 +8,12 @@ namespace JiebaNet.Segmenter.PosSeg;
 public class Viterbi
 {
     private static readonly Lazy<Viterbi> Lazy = new(() => new Viterbi());
+    private readonly Lazy<Probs> _model = new(LoadModel);
 
-    private static IDictionary<string, double> _startProbs;
-    private static IDictionary<string, IDictionary<string, double>> _transProbs;
-    private static IDictionary<string, IDictionary<char, double>> _emitProbs;
-    private static IDictionary<char, List<string>> _stateTab;
-
-    private Viterbi()
-    {
-        LoadModel();
-    }
+    private Viterbi() { }
 
     // TODO: synchronized
-    public static Viterbi Instance
-    {
-        get { return Lazy.Value; }
-    }
+    public static Viterbi Instance => Lazy.Value;
 
     public IEnumerable<Pair> Cut(string sentence)
     {
@@ -60,32 +50,31 @@ public class Viterbi
 
     #region Private Helpers
 
-    private static void LoadModel()
+    private static Probs LoadModel()
     {
-        _startProbs = JsonHelper.DeserializePosProbStart(ConfigManager.ReadResourceText("pos_prob_start.json"));
-
-        _transProbs = JsonHelper.DeserializePosProbTrans(ConfigManager.ReadResourceText("pos_prob_trans.json"));
-
-        _emitProbs = JsonHelper.DeserializePosProbEmit(ConfigManager.ReadResourceText("pos_prob_emit.json"));
-
-        _stateTab = JsonHelper.DeserializeCharStateTab(ConfigManager.ReadResourceText("char_state_tab.json"));
+        var startProbs = JsonHelper.DeserializePosProbStart(ConfigManager.ReadResourceText("pos_prob_start.json"));
+        var transProbs = JsonHelper.DeserializePosProbTrans(ConfigManager.ReadResourceText("pos_prob_trans.json"));
+        var emitProbs = JsonHelper.DeserializePosProbEmit(ConfigManager.ReadResourceText("pos_prob_emit.json"));
+        var stateTab = JsonHelper.DeserializeCharStateTab(ConfigManager.ReadResourceText("char_state_tab.json"));
+        return new Probs(startProbs, transProbs, emitProbs, stateTab);
     }
 
     // TODO: change sentence to obs?
     private Tuple<double, List<string>> ViterbiCut(string sentence)
     {
+        var model = _model.Value;
         var v = new List<IDictionary<string, double>>();
         var memPath = new List<IDictionary<string, string>>();
 
-        var allStates = _transProbs.Keys.ToList();
+        var allStates = model.TransProbs.Keys.ToList();
 
         // Init weights and paths.
         v.Add(new Dictionary<string, double>());
         memPath.Add(new Dictionary<string, string>());
-        foreach (var state in _stateTab.GetDefault(sentence[0], allStates))
+        foreach (var state in model.StateTab.GetDefault(sentence[0], allStates))
         {
-            var emP = _emitProbs[state].GetDefault(sentence[0], Constants.MinProb);
-            v[0][state] = _startProbs[state] + emP;
+            var emP = model.EmitProbs[state].GetDefault(sentence[0], Constants.MinProb);
+            v[0][state] = model.StartProbs[state] + emP;
             memPath[0][state] = string.Empty;
         }
 
@@ -103,7 +92,7 @@ public class Viterbi
             prevStates.Clear();
             foreach (var key in pathPrev.Keys)
             {
-                if (_transProbs[key].Count > 0)
+                if (model.TransProbs[key].Count > 0)
                 {
                     prevStates.Add(key);
                 }
@@ -112,7 +101,7 @@ public class Viterbi
             curPossibleStates.Clear();
             foreach (var s in prevStates)
             {
-                var transitions = _transProbs[s];
+                var transitions = model.TransProbs[s];
                 foreach (var next in transitions.Keys)
                 {
                     curPossibleStates.Add(next);
@@ -120,7 +109,7 @@ public class Viterbi
             }
 
             obsStates.Clear();
-            foreach (var s in _stateTab.GetDefault(sentence[i], allStates))
+            foreach (var s in model.StateTab.GetDefault(sentence[i], allStates))
             {
                 if (curPossibleStates.Contains(s))
                 {
@@ -148,7 +137,7 @@ public class Viterbi
 
             foreach (var y in obsStates)
             {
-                var emit = _emitProbs[y];
+                var emit = model.EmitProbs[y];
                 var emp = emit.TryGetValue(sentence[i], out var emitValue)
                     ? emitValue
                     : Constants.MinProb;
@@ -158,7 +147,7 @@ public class Viterbi
 
                 foreach (var y0 in prevStates)
                 {
-                    var tranp = _transProbs[y0].TryGetValue(y, out var tranValue)
+                    var tranp = model.TransProbs[y0].TryGetValue(y, out var tranValue)
                         ? tranValue
                         : double.MinValue;
                     tranp = vPrev[y0] + tranp + emp;
@@ -209,4 +198,10 @@ public class Viterbi
     }
 
     #endregion
+
+    private sealed record Probs(
+        IDictionary<string, double> StartProbs,
+        IDictionary<string, IDictionary<string, double>> TransProbs,
+        IDictionary<string, IDictionary<char, double>> EmitProbs,
+        IDictionary<char, List<string>> StateTab);
 }

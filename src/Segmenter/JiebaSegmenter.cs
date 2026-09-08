@@ -18,7 +18,7 @@ public partial class JiebaSegmenter
 
     private static readonly object locker = new();
 
-    internal IDictionary<string, string> UserWordTagTab { get; set; }
+    internal IDictionary<string, string> UserWordTagTab { get; set; } = new Dictionary<string, string>();
 
     #region Regular Expressions
 
@@ -38,11 +38,6 @@ public partial class JiebaSegmenter
     private static partial Regex RegexUserDict();
 
     #endregion
-
-    public JiebaSegmenter()
-    {
-        UserWordTagTab = new Dictionary<string, string>();
-    }
 
     /// <summary>
     /// The main function that segments an entire sentence that contains 
@@ -321,12 +316,11 @@ public partial class JiebaSegmenter
 
         var x = 0;
         var buf = new StringBuilder();
-        var N = sentence.Length;
+        var n = sentence.Length;
 
-        var y = -1;
-        while (x < N)
+        while (x < n)
         {
-            y = routeEnd[x] + 1;
+            var y = routeEnd[x] + 1;
             var lWord = sentence.Substring(x, y - x);
             if (lWord.Length == 1 && IsEnglishChar(lWord[0]))
             {
@@ -454,7 +448,7 @@ public partial class JiebaSegmenter
         }
     }
 
-    public void AddWord(string word, int freq = 0, string tag = null)
+    public void AddWord(string word, int freq = 0, string? tag = null)
     {
         if (freq <= 0)
         {
@@ -469,7 +463,7 @@ public partial class JiebaSegmenter
         }
     }
 
-    public void DeleteWord(string word)
+    public static void DeleteWord(string word)
     {
         WordDict.DeleteWord(word);
     }

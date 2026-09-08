@@ -9,7 +9,7 @@ using JiebaNet.Segmenter.Common;
 
 namespace JiebaNet.Segmenter.PosSeg;
 
-public partial class PosSegmenter
+public partial class PosSegmenter(JiebaSegmenter segmenter)
 {
     private static readonly WordDictionary WordDict = WordDictionary.Instance;
     private static readonly Viterbi PosSeg = Viterbi.Instance;
@@ -42,7 +42,7 @@ public partial class PosSegmenter
 
     #endregion
 
-    private static IDictionary<string, string> _wordTagTab;
+    private static readonly Dictionary<string, string> WordTagTab = new();
 
     static PosSegmenter()
     {
@@ -53,7 +53,6 @@ public partial class PosSegmenter
     {
         try
         {
-            _wordTagTab = new Dictionary<string, string>();
             using var sr = new StreamReader(ConfigManager.OpenResource("dict.txt"), Encoding.UTF8);
             while (sr.ReadLine() is { } line)
             {
@@ -67,7 +66,7 @@ public partial class PosSegmenter
                 var word = tokens[0];
                 var tag = tokens[2];
 
-                _wordTagTab[word] = tag;
+                WordTagTab[word] = tag;
             }
         }
         catch (IOException e)
@@ -80,24 +79,16 @@ public partial class PosSegmenter
         }
     }
 
-    private readonly JiebaSegmenter _segmenter;
-
-    public PosSegmenter()
+    public PosSegmenter() : this(new JiebaSegmenter())
     {
-        _segmenter = new JiebaSegmenter();
-    }
-
-    public PosSegmenter(JiebaSegmenter segmenter)
-    {
-        _segmenter = segmenter;
     }
 
     private void CheckNewUserWordTags()
     {
-        if (_segmenter.UserWordTagTab.IsNotEmpty())
+        if (segmenter.UserWordTagTab.IsNotEmpty())
         {
-            _wordTagTab.Update(_segmenter.UserWordTagTab);
-            _segmenter.UserWordTagTab = new Dictionary<string, string>();
+            WordTagTab.Update(segmenter.UserWordTagTab);
+            segmenter.UserWordTagTab = new Dictionary<string, string>();
         }
     }
 
@@ -179,10 +170,10 @@ public partial class PosSegmenter
 
     internal IEnumerable<Pair> CutDag(string sentence)
     {
-        var dag = _segmenter.GetDag(sentence);
+        var dag = segmenter.GetDag(sentence);
         var routeEnd = new int[sentence.Length + 1];
         var routeFreq = new double[sentence.Length + 1];
-        _segmenter.Calc(dag, routeEnd, routeFreq);
+        segmenter.Calc(dag, routeEnd, routeFreq);
 
         var tokens = new List<Pair>();
 
@@ -204,7 +195,7 @@ public partial class PosSegmenter
                     AddBufferToWordList(tokens, buf);
                     buf = string.Empty;
                 }
-                tokens.Add(new Pair(w, _wordTagTab.GetDefault(w, "x")));
+                tokens.Add(new Pair(w, WordTagTab.GetDefault(w, "x")));
             }
             x = y;
         }
@@ -219,10 +210,10 @@ public partial class PosSegmenter
 
     internal IEnumerable<Pair> CutDagWithoutHmm(string sentence)
     {
-        var dag = _segmenter.GetDag(sentence);
+        var dag = segmenter.GetDag(sentence);
         var routeEnd = new int[sentence.Length + 1];
         var routeFreq = new double[sentence.Length + 1];
-        _segmenter.Calc(dag, routeEnd, routeFreq);
+        segmenter.Calc(dag, routeEnd, routeFreq);
 
         var tokens = new List<Pair>();
 
@@ -248,7 +239,7 @@ public partial class PosSegmenter
                     tokens.Add(new Pair(buf, "eng"));
                     buf = string.Empty;
                 }
-                tokens.Add(new Pair(w, _wordTagTab.GetDefault(w, "x")));
+                tokens.Add(new Pair(w, WordTagTab.GetDefault(w, "x")));
                 x = y;
             }
         }
@@ -306,7 +297,7 @@ public partial class PosSegmenter
     {
         if (buf.Length == 1)
         {
-            words.Add(new Pair(buf, _wordTagTab.GetDefault(buf, "x")));
+            words.Add(new Pair(buf, WordTagTab.GetDefault(buf, "x")));
         }
         else
         {

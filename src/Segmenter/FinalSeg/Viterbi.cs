@@ -28,9 +28,14 @@ public partial class Viterbi : IFinalSeg
     [GeneratedRegex(@"([a-zA-Z0-9]+(?:\.\d+)?%?)")]
     private static partial Regex RegexSkip();
 
-    private static Dictionary<char, double>[] _emitProbs;  // [state] -> char of sentence -> prob
-    private static double[] _startProbs;                    // [state]
-    private static double[][] _transProbs;                  // [prev][cur]
+    private readonly Dictionary<char, double>[] _emitProbs = new Dictionary<char, double>[4];  // [state] -> char of sentence -> prob
+    private readonly double[] _startProbs = [
+        -0.26268660809250016,  // B
+        -3.14e+100,            // M
+        -3.14e+100,            // E
+        -1.4652633398537678    // S
+    ];                    // [state]
+    private readonly double[][] _transProbs = new double[4][];                  // [prev][cur]
 
     private Viterbi()
     {
@@ -38,10 +43,7 @@ public partial class Viterbi : IFinalSeg
     }
 
     // TODO: synchronized
-    public static Viterbi Instance
-    {
-        get { return Lazy.Value; }
-    }
+    public static Viterbi Instance => Lazy.Value;
 
     public IEnumerable<string> Cut(string sentence)
     {
@@ -68,22 +70,12 @@ public partial class Viterbi : IFinalSeg
         var stopWatch = new Stopwatch();
         stopWatch.Start();
 
-        _startProbs =
-        [
-            -0.26268660809250016,  // B
-            -3.14e+100,            // M
-            -3.14e+100,            // E
-            -1.4652633398537678    // S
-        ];
-
         var transJson = ConfigManager.ReadResourceText("prob_trans.json");
         var transTable = JsonHelper.DeserializeProbTable(transJson);
 
         var emitJson = ConfigManager.ReadResourceText("prob_emit.json");
         var emitTable = JsonHelper.DeserializeProbTable(emitJson);
-
-        _transProbs = new double[4][];
-        _emitProbs = new Dictionary<char, double>[4];
+        
         for (var si = 0; si < 4; si++)
         {
             var state = States[si];
@@ -153,8 +145,7 @@ public partial class Viterbi : IFinalSeg
         var probS = v[lastBase + 3];
         var state = probE < probS ? 3 : 2;
 
-        var posList = new List<char>(n);
-        posList.Add(States[state]);
+        var posList = new List<char>(n) { States[state] };
         for (var i = n - 1; i > 0; i--)
         {
             state = bestPrev[i * 4 + state];

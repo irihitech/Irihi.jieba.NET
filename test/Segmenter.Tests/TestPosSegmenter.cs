@@ -61,8 +61,8 @@ public class TestPosSegmenter
         lastToken = tokens.Last();
         Assert.That(lastToken.Word, Is.EqualTo("自然语言处理"));
         Assert.That(lastToken.Flag, Is.EqualTo("n"));
-            
-        seg.DeleteWord("自然语言处理");
+
+        JiebaSegmenter.DeleteWord("自然语言处理");
     }
 
     [TestCase]

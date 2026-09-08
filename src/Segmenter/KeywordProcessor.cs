@@ -138,7 +138,7 @@ public class KeywordProcessor
                         
                     if (longestFound.IsNotEmpty())
                     {
-                        keywordsExtracted.Add(new TextSpan(text: longestFound, start: seqStartPos, end: idx));
+                        keywordsExtracted.Add(new TextSpan(Text: longestFound, Start: seqStartPos, End: idx));
                     }
 
                     currentState = _keywordTrie;
@@ -178,7 +178,7 @@ public class KeywordProcessor
                 if (currentState.HasValue)
                 {
                     var seqFound = currentState.Value;
-                    keywordsExtracted.Add(new TextSpan(text: seqFound, start: seqStartPos, end: sentLen));
+                    keywordsExtracted.Add(new TextSpan(Text: seqFound, Start: seqStartPos, End: sentLen));
                 }
             }
 

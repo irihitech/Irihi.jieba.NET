@@ -37,7 +37,7 @@ public class TestDemo
         segments = segmenter.Cut("腾讯视频致力于打造中国最大的在线视频媒体平台,以丰富的内容、极致的观看体验");
         Console.WriteLine("【精确模式】：{0}", string.Join("/ ", segments));
 
-        segmenter.DeleteWord("湖南");
+        JiebaSegmenter.DeleteWord("湖南");
         segmenter.AddWord("湖南");
         //segmenter.AddWord("长沙市");
         segments = segmenter.Cut("湖南长沙市天心区");
