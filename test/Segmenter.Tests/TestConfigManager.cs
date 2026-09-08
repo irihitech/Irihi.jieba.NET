@@ -13,16 +13,12 @@ public class TestConfigManager
     {
         Assert.That(ConfigManager.HasCustomConfigFileDir, Is.False);
 
-        using (var stream = ConfigManager.OpenResource("dict.txt"))
-        {
-            Assert.That(stream, Is.Not.Null);
-            Assert.That(stream, Is.Not.InstanceOf<FileStream>());
-            using (var reader = new StreamReader(stream))
-            {
-                var firstLine = reader.ReadLine();
-                Assert.That(firstLine, Is.Not.Empty);
-            }
-        }
+        using var stream = ConfigManager.OpenResource("dict.txt");
+        Assert.That(stream, Is.Not.Null);
+        Assert.That(stream, Is.Not.InstanceOf<FileStream>());
+        using var reader = new StreamReader(stream);
+        var firstLine = reader.ReadLine();
+        Assert.That(firstLine, Is.Not.Empty);
     }
 
     [TestCase]
@@ -38,14 +34,10 @@ public class TestConfigManager
             Assert.That(ConfigManager.HasCustomConfigFileDir, Is.True);
             Assert.That(ConfigManager.MainDictFile, Is.EqualTo(Path.Combine(tempDir, "dict.txt")));
 
-            using (var stream = ConfigManager.OpenResource("dict.txt"))
-            {
-                Assert.That(stream, Is.InstanceOf<FileStream>());
-                using (var reader = new StreamReader(stream, Encoding.UTF8))
-                {
-                    Assert.That(reader.ReadLine(), Is.EqualTo("测试 100"));
-                }
-            }
+            using var stream = ConfigManager.OpenResource("dict.txt");
+            Assert.That(stream, Is.InstanceOf<FileStream>());
+            using var reader = new StreamReader(stream, Encoding.UTF8);
+            Assert.That(reader.ReadLine(), Is.EqualTo("测试 100"));
         }
         finally
         {

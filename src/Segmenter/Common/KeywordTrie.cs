@@ -4,23 +4,23 @@ namespace JiebaNet.Segmenter.Common;
 
 public class KeywordTrieNode
 {
-    private IDictionary<char, KeywordTrieNode> _children;
+    private readonly IDictionary<char, KeywordTrieNode> _children;
     // private string _value;
         
-    public KeywordTrieNode(string value = null)
+    public KeywordTrieNode(string? value = null)
     {
         _children = new Dictionary<char, KeywordTrieNode>();
         Value = value;
     }
 
-    public string Value { get; set; }
+    public string? Value { get; set; }
 
-    public bool HasValue => Value.IsNotNull();
+    public bool HasValue => Value is not null;
 
-    public KeywordTrieNode AddChild(char ch, string value = null, bool overwrite = false)
+    public KeywordTrieNode AddChild(char ch, string? value = null, bool overwrite = false)
     {
         var child = _children.GetOrDefault(ch);
-        if (child.IsNull())
+        if (child is null)
         {
             child = new KeywordTrieNode(value);
             _children[ch] = child;
@@ -56,7 +56,7 @@ public class KeywordTrie: KeywordTrieNode
         
     public bool Contains(string key)
     {
-        return GetItem(key).IsNotNull();
+        return GetItem(key) is not null;
     }
 
     public void Remove(string key)
@@ -73,13 +73,13 @@ public class KeywordTrie: KeywordTrieNode
 
     #region Private Methods
 
-    private string GetItem(string key)
+    private string? GetItem(string key)
     {
         KeywordTrieNode state = this;
         foreach (var ch in key)
         {
             state = state.GetChild(ch);
-            if (state.IsNull())
+            if (state is null)
             {
                 return null;
             }
@@ -101,7 +101,7 @@ public class KeywordTrie: KeywordTrieNode
             {
                 var child = state.GetChild(key[i]);
                 state = state.AddChild(key[i], value, true);
-                if (child.IsNull() || !child.HasValue)
+                if (child is null || !child.HasValue)
                 {
                     Count += 1;
                 }

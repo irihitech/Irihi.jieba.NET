@@ -32,8 +32,8 @@ public class UndirectWeightedGraph
             Graph[end] = new List<Edge>();
         }
 
-        Graph[start].Add(new Edge(){ Start = start, End = end, Weight = weight });
-        Graph[end].Add(new Edge(){ Start = end, End = start, Weight = weight });
+        Graph[start].Add(new Edge { Start = start, End = end, Weight = weight });
+        Graph[end].Add(new Edge { Start = end, End = start, Weight = weight });
     }
 
     public IDictionary<string, double> Rank()

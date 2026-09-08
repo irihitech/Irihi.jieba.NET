@@ -1,9 +1,9 @@
 ﻿namespace JiebaNet.Segmenter.PosSeg;
 
-public class Pair
+public record Pair
 {
-    public string Word { get; set; }
-    public string Flag { get; set; }
+    public string Word { get; }
+    public string Flag { get; }
     public Pair(string word, string flag)
     {
         Word = word;
@@ -12,6 +12,6 @@ public class Pair
 
     public override string ToString()
     {
-        return string.Format("{0}/{1}", Word, Flag);
+        return $"{Word}/{Flag}";
     }
 }

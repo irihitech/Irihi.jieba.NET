@@ -75,10 +75,8 @@ public class ConfigManager
     /// </summary>
     public static string ReadResourceText(string fileName)
     {
-        using (var reader = new StreamReader(OpenResource(fileName), Encoding.UTF8))
-        {
-            return reader.ReadToEnd();
-        }
+        using var reader = new StreamReader(OpenResource(fileName), Encoding.UTF8);
+        return reader.ReadToEnd();
     }
 
     public static string MainDictFile

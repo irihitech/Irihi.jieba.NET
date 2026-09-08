@@ -9,7 +9,7 @@ public class TrieNode
 {
     public char Char { get; set; }
     public int Frequency { get; set; }
-    public Dictionary<char, TrieNode> Children { get; set; }
+    public Dictionary<char, TrieNode>? Children { get; set; }
 
     public TrieNode(char ch)
     {
@@ -27,10 +27,7 @@ public class TrieNode
             return 0;
         }
 
-        if (Children == null)
-        {
-            Children = new Dictionary<char, TrieNode>();
-        }
+        Children ??= new Dictionary<char, TrieNode>();
 
         var c = s[pos];
         if (!Children.ContainsKey(c))
@@ -48,7 +45,7 @@ public class TrieNode
         return curNode.Insert(s, pos + 1, freq);
     }
 
-    public TrieNode Search(string s, int pos)
+    public TrieNode? Search(string s, int pos)
     {
         if (string.IsNullOrEmpty(s))
         {
@@ -117,7 +114,7 @@ public class Trie : ITrie
         CheckWord(word);
 
         var node = Root.Search(word.Trim(), 0);
-        return node.IsNull() ? 0 : node.Frequency;
+        return node is null ? 0 : node.Frequency;
     }
 
     public int Insert(string word, int freq = 1)
@@ -137,7 +134,7 @@ public class Trie : ITrie
     public IEnumerable<char> ChildChars(string prefix)
     {
         var node = Root.Search(prefix.Trim(), 0);
-        return node.IsNull() || node.Children.IsNull() ? null : node.Children.Select(p => p.Key);
+        return node is null || node.Children is null ? null : node.Children.Select(p => p.Key);
     }
 
     private void CheckWord(string word)

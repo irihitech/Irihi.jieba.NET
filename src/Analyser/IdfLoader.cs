@@ -49,19 +49,16 @@ public class IdfLoader
 
     private void LoadFrom(Stream stream)
     {
-        using (var reader = new StreamReader(stream, Encoding.UTF8))
+        using var reader = new StreamReader(stream, Encoding.UTF8);
+        IdfFreq = new Dictionary<string, double>();
+        while (reader.ReadLine() is { } line)
         {
-            IdfFreq = new Dictionary<string, double>();
-            string line;
-            while ((line = reader.ReadLine()) != null)
-            {
-                var parts = line.Trim().Split(' ');
-                var word = parts[0];
-                var freq = double.Parse(parts[1]);
-                IdfFreq[word] = freq;
-            }
-
-            MedianIdf = IdfFreq.Values.OrderBy(v => v).ToList()[IdfFreq.Count / 2];
+            var parts = line.Trim().Split(' ');
+            var word = parts[0];
+            var freq = double.Parse(parts[1]);
+            IdfFreq[word] = freq;
         }
+
+        MedianIdf = IdfFreq.Values.OrderBy(v => v).ToList()[IdfFreq.Count / 2];
     }
 }

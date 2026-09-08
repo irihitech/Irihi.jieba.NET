@@ -37,7 +37,7 @@ public static partial class Extensions
         return (enumerable != null) && enumerable.Any();
     }
 
-    public static TValue GetOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> d, TKey key)
+    public static TValue? GetOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> d, TKey key)
     {
         return d.ContainsKey(key) ? d[key] : default(TValue);
     }

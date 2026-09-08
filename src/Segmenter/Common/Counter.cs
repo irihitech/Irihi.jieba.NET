@@ -52,9 +52,9 @@ public interface ICounter<T>
     bool Contains(T key);
 }
 
-public class Counter<T>: ICounter<T>
+public class Counter<T>: ICounter<T> where T: notnull
 {
-    private Dictionary<T, int> data = new();
+    private readonly Dictionary<T, int> _data = new();
 
     public Counter() {}
 
@@ -63,19 +63,19 @@ public class Counter<T>: ICounter<T>
         CountItems(items);
     }
 
-    public int Count => data.Count;
-    public int Total => data.Values.Sum();
-    public IEnumerable<KeyValuePair<T, int>> Elements => data;
+    public int Count => _data.Count;
+    public int Total => _data.Values.Sum();
+    public IEnumerable<KeyValuePair<T, int>> Elements => _data;
 
     public int this[T key]
     {
-        get => data.ContainsKey(key) ? data[key] : 0;
-        set => data[key] = value;
+        get => _data.ContainsKey(key) ? _data[key] : 0;
+        set => _data[key] = value;
     }
 
     public IEnumerable<KeyValuePair<T, int>> MostCommon(int n = -1)
     {
-        var pairs = data.Where(pair => pair.Value > 0).OrderByDescending(pair => pair.Value);
+        var pairs = _data.Where(pair => pair.Value > 0).OrderByDescending(pair => pair.Value);
         return n < 0 ? pairs : pairs.Take(n);
     }
 
@@ -102,7 +102,7 @@ public class Counter<T>: ICounter<T>
     public ICounter<T> Union(ICounter<T> other)
     {
         var result = new Counter<T>();
-        foreach (var pair in data)
+        foreach (var pair in _data)
         {
             var count = pair.Value;
             var otherCount = other[pair.Key];
@@ -122,20 +122,17 @@ public class Counter<T>: ICounter<T>
 
     public void Remove(T key)
     {
-        if (data.ContainsKey(key))
-        {
-            data.Remove(key);
-        }
+        _data.Remove(key);
     }
 
     public void Clear()
     {
-        data.Clear();
+        _data.Clear();
     }
 
     public bool Contains(T key)
     {
-        return data.ContainsKey(key);
+        return _data.ContainsKey(key);
     }
 
     #region Private Methods
@@ -144,7 +141,7 @@ public class Counter<T>: ICounter<T>
     {
         foreach (var item in items)
         {
-            data[item] = data.GetDefault(item, 0) + 1;
+            _data[item] = _data.GetDefault(item, 0) + 1;
         }
     }
 
@@ -160,7 +157,7 @@ public class Counter<T>: ICounter<T>
     {
         foreach (var item in items)
         {
-            data[item] = data.GetDefault(item, 0) - 1;
+            _data[item] = _data.GetDefault(item, 0) - 1;
         }
     }
 

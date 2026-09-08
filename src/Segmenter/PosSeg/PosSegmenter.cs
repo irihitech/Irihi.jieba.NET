@@ -54,23 +54,21 @@ public partial class PosSegmenter
         try
         {
             _wordTagTab = new Dictionary<string, string>();
-            using (var sr = new StreamReader(ConfigManager.OpenResource("dict.txt"), Encoding.UTF8))
+            using var sr = new StreamReader(ConfigManager.OpenResource("dict.txt"), Encoding.UTF8);
+            string line;
+            while ((line = sr.ReadLine()) != null)
             {
-                string line;
-                while ((line = sr.ReadLine()) != null)
+                var tokens = line.Split(' ');
+                if (tokens.Length < 2)
                 {
-                    var tokens = line.Split(' ');
-                    if (tokens.Length < 2)
-                    {
-                        Debug.Fail(string.Format("Invalid line: {0}", line));
-                        continue;
-                    }
-
-                    var word = tokens[0];
-                    var tag = tokens[2];
-
-                    _wordTagTab[word] = tag;
+                    Debug.Fail(string.Format("Invalid line: {0}", line));
+                    continue;
                 }
+
+                var word = tokens[0];
+                var tag = tokens[2];
+
+                _wordTagTab[word] = tag;
             }
         }
         catch (IOException e)
@@ -83,7 +81,7 @@ public partial class PosSegmenter
         }
     }
 
-    private JiebaSegmenter _segmenter;
+    private readonly JiebaSegmenter _segmenter;
 
     public PosSegmenter()
     {

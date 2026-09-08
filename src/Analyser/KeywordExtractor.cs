@@ -13,7 +13,7 @@ public abstract class KeywordExtractor
         "this", "then", "at", "have", "all", "not", "one", "has", "or", "that"
     ];
 
-    protected virtual ISet<string> StopWords { get; set; }
+    protected ISet<string> StopWords { get; set; } = new HashSet<string>();
 
     /// <summary>
     /// Loads the built-in stop words from the embedded resources.
@@ -22,13 +22,11 @@ public abstract class KeywordExtractor
     {
         StopWords = new HashSet<string>();
 
-        using (var reader = new StreamReader(ConfigManager.OpenResource("stopwords.txt")))
+        using var reader = new StreamReader(ConfigManager.OpenResource("stopwords.txt"));
+        string line;
+        while ((line = reader.ReadLine()) != null)
         {
-            string line;
-            while ((line = reader.ReadLine()) != null)
-            {
-                StopWords.Add(line.Trim());
-            }
+            StopWords.Add(line.Trim());
         }
     }
 
@@ -49,13 +47,10 @@ public abstract class KeywordExtractor
 
     public void AddStopWord(string word)
     {
-        if (!StopWords.Contains(word))
-        {
-            StopWords.Add(word.Trim());
-        }
+        StopWords.Add(word.Trim());
     }
 
-    public void AddStopWords(IEnumerable<string> words)
+    public void AddStopWords(ICollection<string> words)
     {
         foreach (var word in words)
         {
@@ -63,6 +58,6 @@ public abstract class KeywordExtractor
         }
     }
 
-    public abstract IEnumerable<string> ExtractTags(string text, int count = 20, IEnumerable<string> allowPos = null);
-    public abstract IEnumerable<WordWeightPair> ExtractTagsWithWeight(string text, int count = 20, IEnumerable<string> allowPos = null);
+    public abstract IEnumerable<string> ExtractTags(string text, int count = 20, ICollection<string>? allowPos = null);
+    public abstract IEnumerable<WordWeightPair> ExtractTagsWithWeight(string text, int count = 20, ICollection<string>? allowPos = null);
 }

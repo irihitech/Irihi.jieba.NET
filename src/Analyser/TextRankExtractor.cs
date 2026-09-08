@@ -8,7 +8,7 @@ namespace JiebaNet.Analyser;
 
 public class TextRankExtractor : KeywordExtractor
 {
-    private static readonly IEnumerable<string> DefaultPosFilter = new List<string>()
+    private static readonly IEnumerable<string> DefaultPosFilter = new List<string>
     {
         "n", "ng", "nr", "nrfg", "nrt", "ns", "nt", "nz", "v", "vd", "vg", "vi", "vn", "vq"
     };
@@ -38,18 +38,18 @@ public class TextRankExtractor : KeywordExtractor
         }
     }
 
-    public override IEnumerable<string> ExtractTags(string text, int count = 20, IEnumerable<string> allowPos = null)
+    public override IEnumerable<string> ExtractTags(string text, int count = 20, ICollection<string>? allowPos = null)
     {
         var rank = ExtractTagRank(text, allowPos);
         if (count <= 0) { count = 20; }
         return rank.OrderByDescending(p => p.Value).Select(p => p.Key).Take(count);
     }
 
-    public override IEnumerable<WordWeightPair> ExtractTagsWithWeight(string text, int count = 20, IEnumerable<string> allowPos = null)
+    public override IEnumerable<WordWeightPair> ExtractTagsWithWeight(string text, int count = 20, ICollection<string>? allowPos = null)
     {
         var rank = ExtractTagRank(text, allowPos);
         if (count <= 0) { count = 20; }
-        return rank.OrderByDescending(p => p.Value).Select(p => new WordWeightPair()
+        return rank.OrderByDescending(p => p.Value).Select(p => new WordWeightPair
         {
             Word = p.Key, Weight = p.Value
         }).Take(count);

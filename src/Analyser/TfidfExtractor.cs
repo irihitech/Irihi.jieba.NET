@@ -17,9 +17,9 @@ public class TfidfExtractor : KeywordExtractor
     private IDictionary<string, double> IdfFreq { get; set; }
     private double MedianIdf { get; set; }
 
-    public TfidfExtractor(JiebaSegmenter segmenter = null)
+    public TfidfExtractor(JiebaSegmenter? segmenter = null)
     {
-        Segmenter = segmenter.IsNull() ? new JiebaSegmenter() : segmenter;
+        Segmenter = segmenter ?? new JiebaSegmenter();
         PosSegmenter = new PosSegmenter(Segmenter);
         SetDefaultStopWords();
         if (StopWords.IsEmpty())
@@ -78,7 +78,7 @@ public class TfidfExtractor : KeywordExtractor
         return freq;
     }
 
-    public override IEnumerable<string> ExtractTags(string text, int count = 20, IEnumerable<string> allowPos = null)
+    public override IEnumerable<string> ExtractTags(string text, int count = 20, ICollection<string>? allowPos = null)
     {
         if (count <= 0) { count = DefaultWordCount; }
 
@@ -86,12 +86,12 @@ public class TfidfExtractor : KeywordExtractor
         return freq.OrderByDescending(p => p.Value).Select(p => p.Key).Take(count);
     }
 
-    public override IEnumerable<WordWeightPair> ExtractTagsWithWeight(string text, int count = 20, IEnumerable<string> allowPos = null)
+    public override IEnumerable<WordWeightPair> ExtractTagsWithWeight(string text, int count = 20, ICollection<string>? allowPos = null)
     {
         if (count <= 0) { count = DefaultWordCount; }
 
         var freq = GetWordIfidf(text, allowPos);
-        return freq.OrderByDescending(p => p.Value).Select(p => new WordWeightPair()
+        return freq.OrderByDescending(p => p.Value).Select(p => new WordWeightPair
         {
             Word = p.Key, Weight = p.Value
         }).Take(count);
