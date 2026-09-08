@@ -113,7 +113,7 @@ public class Program
             cutMethod = (text, cutAll, hmm) =>
             {
                 var posSeg = new PosSegmenter(segmenter);
-                return posSeg.Cut(text, hmm).Select(token => string.Format("{0}/{1}", token.Word, token.Flag));
+                return posSeg.Cut(text, hmm).Select(token => $"{token.Word}/{token.Flag}");
             };
         }
         else

@@ -55,7 +55,7 @@ public class WordDictionary
                     var firstSpace = span.IndexOf(' ');
                     if (firstSpace < 0)
                     {
-                        Debug.Fail(string.Format("Invalid line: {0}", line));
+                        Debug.Fail($"Invalid line: {line}");
                         continue;
                     }
 
@@ -91,7 +91,7 @@ public class WordDictionary
         }
         catch (IOException e)
         {
-            Debug.Fail(string.Format("dict.txt load failure, reason: {0}", e.Message));
+            Debug.Fail($"dict.txt load failure, reason: {e.Message}");
         }
         catch (FormatException fe)
         {

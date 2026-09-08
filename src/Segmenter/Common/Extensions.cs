@@ -9,22 +9,7 @@ public static partial class Extensions
 {
     [GeneratedRegex(@"\d+")]
     private static partial Regex RegexDigits();
-
-    #region Objects
-
-    public static bool IsNull(this object obj)
-    {
-        return obj == null;
-    }
-
-    public static bool IsNotNull(this object obj)
-    {
-        return obj != null;
-    }
-
-    #endregion
-
-
+    
     #region Enumerable
 
     public static bool IsEmpty<T>(this IEnumerable<T> enumerable)

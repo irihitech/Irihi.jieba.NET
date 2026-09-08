@@ -112,7 +112,7 @@ public class KeywordTrie: KeywordTrieNode
     #endregion
 }
     
-public class TextSpan
+public record TextSpan
 {
     public string Text { get; }
     public int Start { get; }
@@ -124,61 +124,7 @@ public class TextSpan
         Start = start;
         End = end;
     }
-
-    public override bool Equals(object obj)
-    {
-        return Equals(obj as TextSpan);
-    }
-
-    public bool Equals(TextSpan span)
-    {
-        if (ReferenceEquals(span, null))
-        {
-            return false;
-        }
-
-        if (ReferenceEquals(this, span))
-        {
-            return true;
-        }
-
-        if (this.GetType() != span.GetType())
-        {
-            return false;
-        }
-
-        return Text == span.Text && Start == span.Start && End == span.End;
-    }
-
-    public static bool operator ==(TextSpan lhs, TextSpan rhs)
-    {
-        if (ReferenceEquals(lhs, null))
-        {
-            if (ReferenceEquals(rhs, null))
-            {
-                return true;
-            }
-
-            return false;
-        }
-
-        return lhs.Equals(rhs);
-    }
-
-    public static bool operator !=(TextSpan lhs, TextSpan rhs)
-    {
-        return !(lhs == rhs);
-    }
-
-    public override int GetHashCode()
-    {
-        var hash = 13;
-        hash = (hash * 7) + Text.GetHashCode();
-        hash = (hash * 7) + Start.GetHashCode();
-        hash = (hash * 7) + End.GetHashCode();
-        return hash;
-    }
-
+    
     public override string ToString()
     {
         return $"<{Text}({Start}, {End})>";

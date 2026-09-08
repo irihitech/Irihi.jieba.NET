@@ -8,7 +8,7 @@ namespace JiebaNet.Analyser;
 
 public class TextRankExtractor : KeywordExtractor
 {
-    private static readonly IEnumerable<string> DefaultPosFilter = new List<string>
+    private static readonly List<string> DefaultPosFilter = new List<string>
     {
         "n", "ng", "nr", "nrfg", "nrt", "ns", "nt", "nz", "v", "vd", "vg", "vi", "vn", "vq"
     };
@@ -57,9 +57,9 @@ public class TextRankExtractor : KeywordExtractor
 
     #region Private Helpers
 
-    private IDictionary<string, double> ExtractTagRank(string text, IEnumerable<string> allowPos)
+    private IDictionary<string, double> ExtractTagRank(string text, ICollection<string>? allowPos)
     {
-        if (allowPos.IsEmpty())
+        if (allowPos is null || allowPos.Count == 0)
         {
             allowPos = DefaultPosFilter;
         }

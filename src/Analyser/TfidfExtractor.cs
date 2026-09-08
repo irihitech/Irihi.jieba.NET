@@ -40,13 +40,13 @@ public class TfidfExtractor : KeywordExtractor
         MedianIdf = Loader.MedianIdf;
     }
 
-    private IEnumerable<string> FilterCutByPos(string text, IEnumerable<string> allowPos)
+    private IEnumerable<string> FilterCutByPos(string text, ICollection<string> allowPos)
     {
         var posTags = PosSegmenter.Cut(text).Where(p => allowPos.Contains(p.Flag));
         return posTags.Select(p => p.Word);
     }
 
-    private IDictionary<string, double> GetWordIfidf(string text, IEnumerable<string> allowPos)
+    private IDictionary<string, double> GetWordIfidf(string text, ICollection<string> allowPos)
     {
         IEnumerable<string> words = null;
         if (allowPos.IsNotEmpty())

@@ -71,7 +71,7 @@ public class SpellChecker : ISpellChecker
             }
 
             var node = WordTrie.Root.Children[word[0]];
-            for (int i = 1; node.IsNotNull() && node.Children.IsNotEmpty() && i < word.Length; i++)
+            for (int i = 1; node is not null && node.Children.IsNotEmpty() && i < word.Length; i++)
             {
                 foreach (var c in node.Children.Keys)
                 {
@@ -94,7 +94,7 @@ public class SpellChecker : ISpellChecker
             }
 
             var node = WordTrie.Root.Children.GetOrDefault(word[0]);
-            for (int i = 0; node.IsNotNull() && node.Children.IsNotEmpty() && i < word.Length; i++)
+            for (int i = 0; node is not null && node.Children.IsNotEmpty() && i < word.Length; i++)
             {
                 foreach (var c in node.Children.Keys)
                 {

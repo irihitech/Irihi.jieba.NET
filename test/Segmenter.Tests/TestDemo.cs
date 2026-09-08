@@ -75,7 +75,7 @@ public class TestDemo
         var s = "一团硕大无朋的高能离子云，在遥远而神秘的太空中迅疾地飘移";
 
         var tokens = posSeg.Cut(s);
-        Console.WriteLine(string.Join(" ", tokens.Select(token => string.Format("{0}/{1}", token.Word, token.Flag))));
+        Console.WriteLine(string.Join(" ", tokens.Select(token => $"{token.Word}/{token.Flag}")));
     }
 
     [TestCase]

@@ -9,9 +9,9 @@ public class KeywordProcessor
     // private readonly string _keyword = "_keyword_";
     // private readonly ISet<char> _whiteSpaceChars = new HashSet<char>(".\t\n\a ,");
     // private readonly bool CaseSensitive;
-    private readonly KeywordTrie KeywordTrie = new();
+    private readonly KeywordTrie _keywordTrie = new();
 
-    private readonly ISet<char> NonWordBoundries =
+    private readonly ISet<char> _nonWordBoundaries =
         new HashSet<char>("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_");
 
     public bool CaseSensitive { get; }
@@ -40,7 +40,7 @@ public class KeywordProcessor
         {
             keyword = keyword.ToLower();
         }
-        KeywordTrie.Remove(keyword);
+        _keywordTrie.Remove(keyword);
     }
         
     public void RemoveKeywords(IEnumerable<string> keywords)
@@ -53,7 +53,7 @@ public class KeywordProcessor
 
     public bool Contains(string word)
     {
-        return GetItem(word).IsNotNull();
+        return GetItem(word) is not null;
     }
 
     public IEnumerable<TextSpan> ExtractKeywordSpans(string sentence)
@@ -69,7 +69,7 @@ public class KeywordProcessor
             sentence = sentence.ToLower();
         }
 
-        KeywordTrieNode currentState = KeywordTrie;
+        KeywordTrieNode currentState = _keywordTrie;
         var seqStartPos = 0;
         var seqEndPos = 0;
         var resetCurrentDict = false;
@@ -79,13 +79,13 @@ public class KeywordProcessor
         {
             var ch = sentence[idx];
             // when reaching a char that denote word end
-            if (!NonWordBoundries.Contains(ch))
+            if (!_nonWordBoundaries.Contains(ch))
             {
                 // if current prefix is in trie
                 if (currentState.HasValue || currentState.HasChild(ch))
                 {
                     //string seqFound = null;
-                    string longestFound = null;
+                    string? longestFound = null;
                     var isLongerFound = false;
                         
                     if (currentState.HasValue)
@@ -103,7 +103,7 @@ public class KeywordProcessor
                         while (idy < sentLen)
                         {
                             var innerCh = sentence[idy];
-                            if (!NonWordBoundries.Contains(innerCh) && curStateContinued.HasValue)
+                            if (!_nonWordBoundaries.Contains(innerCh) && curStateContinued.HasValue)
                             {
                                 longestFound = curStateContinued.Value;
                                 seqEndPos = idy;
@@ -141,12 +141,12 @@ public class KeywordProcessor
                         keywordsExtracted.Add(new TextSpan(text: longestFound, start: seqStartPos, end: idx));
                     }
 
-                    currentState = KeywordTrie;
+                    currentState = _keywordTrie;
                     resetCurrentDict = true;
                 }
                 else
                 {
-                    currentState = KeywordTrie;
+                    currentState = _keywordTrie;
                     resetCurrentDict = true;
                 }
             }
@@ -156,14 +156,14 @@ public class KeywordProcessor
             }
             else
             {
-                currentState = KeywordTrie;
+                currentState = _keywordTrie;
                 resetCurrentDict = true;
                     
                 // skip to end of word
                 var idy = idx + 1;
                 while (idy < sentLen)
                 {
-                    if (!NonWordBoundries.Contains(sentence[idy]))
+                    if (!_nonWordBoundaries.Contains(sentence[idy]))
                     {
                         break;
                     }
@@ -219,7 +219,7 @@ public class KeywordProcessor
                 keyword = keyword.ToLower();
             }
 
-            KeywordTrie[keyword] = cleanName;
+            _keywordTrie[keyword] = cleanName;
         }
     }
         
@@ -230,7 +230,7 @@ public class KeywordProcessor
             word = word.ToLower();
         }
 
-        return KeywordTrie[word];
+        return _keywordTrie[word];
     }
 
     #endregion

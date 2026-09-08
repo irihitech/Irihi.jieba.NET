@@ -15,7 +15,7 @@ public partial class PosSegmenter
     private static readonly Viterbi PosSeg = Viterbi.Instance;
 
     // TODO: 
-    private static readonly object locker = new();
+    private static readonly object Locker = new();
 
     #region Regular Expressions
 
@@ -55,13 +55,12 @@ public partial class PosSegmenter
         {
             _wordTagTab = new Dictionary<string, string>();
             using var sr = new StreamReader(ConfigManager.OpenResource("dict.txt"), Encoding.UTF8);
-            string line;
-            while ((line = sr.ReadLine()) != null)
+            while (sr.ReadLine() is { } line)
             {
                 var tokens = line.Split(' ');
                 if (tokens.Length < 2)
                 {
-                    Debug.Fail(string.Format("Invalid line: {0}", line));
+                    Debug.Fail($"Invalid line: {line}");
                     continue;
                 }
 
@@ -73,7 +72,7 @@ public partial class PosSegmenter
         }
         catch (IOException e)
         {
-            Debug.Fail(string.Format("Word tag table load failure, reason: {0}", e.Message));
+            Debug.Fail($"Word tag table load failure, reason: {e.Message}");
         }
         catch (FormatException fe)
         {

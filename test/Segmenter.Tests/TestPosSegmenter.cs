@@ -99,7 +99,7 @@ public class TestPosSegmenter
             var testResult = testResults[i];
 
             var tokens = method(testCase, useHmm);
-            var actualResult = string.Join(" ", tokens.Select(token => string.Format("{0}/{1}", token.Word, token.Flag)));
+            var actualResult = string.Join(" ", tokens.Select(token => $"{token.Word}/{token.Flag}"));
 
             Assert.That(actualResult, Is.EqualTo(testResult));
         }

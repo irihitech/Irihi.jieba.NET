@@ -98,7 +98,7 @@ public class Trie : ITrie
         CheckWord(word);
 
         var node = Root.Search(word.Trim(), 0);
-        return node.IsNotNull() && node.Frequency > 0;
+        return node is not null && node.Frequency > 0;
     }
 
     public bool ContainsPrefix(string word)
@@ -106,7 +106,7 @@ public class Trie : ITrie
         CheckWord(word);
 
         var node = Root.Search(word.Trim(), 0);
-        return node.IsNotNull();
+        return node is not null;
     }
 
     public int Frequency(string word)

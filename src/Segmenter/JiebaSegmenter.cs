@@ -445,7 +445,7 @@ public partial class JiebaSegmenter
             }
             catch (IOException e)
             {
-                Debug.Fail(string.Format("'{0}' load failure, reason: {1}", dictFullPath, e.Message));
+                Debug.Fail($"'{dictFullPath}' load failure, reason: {e.Message}");
             }
             catch (FormatException fe)
             {
