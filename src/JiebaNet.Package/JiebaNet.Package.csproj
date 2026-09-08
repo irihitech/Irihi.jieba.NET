@@ -13,11 +13,12 @@
     <PackageId>Irihi.JiebaNet</PackageId>
     <Version>0.42.2</Version>
     <Authors>irihitech</Authors>
-    <Company>irihitech</Company>
+    <Company>IRIHI Technology</Company>
     <Product>Irihi.JiebaNet</Product>
     <Description>Chinese words segmentation and keyword extraction (jieba.NET fork). Ships JiebaNet.Segmenter and JiebaNet.Analyser in a single package.</Description>
     <PackageTags>jieba;chinese;segmentation;nlp;avalonia</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageIcon>irihi.png</PackageIcon>
     <RepositoryUrl>https://github.com/irihitech/Irihi.jieba.NET</RepositoryUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
 
@@ -27,6 +28,7 @@
 
   <ItemGroup>
     <None Include="..\..\README.md" Pack="true" PackagePath="README.md" />
+    <None Include="..\..\irihi.png" Pack="true" PackagePath="irihi.png" />
   </ItemGroup>
 
   <!--
