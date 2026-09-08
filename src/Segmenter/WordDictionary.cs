@@ -48,8 +48,7 @@ public class WordDictionary
 
             using (var sr = new StreamReader(ConfigManager.OpenResource("dict.txt"), Encoding.UTF8))
             {
-                string line = null;
-                while ((line = sr.ReadLine()) != null)
+                while (sr.ReadLine() is { } line)
                 {
                     var span = line.AsSpan();
                     var firstSpace = span.IndexOf(' ');
@@ -127,7 +126,7 @@ public class WordDictionary
             return 1;
     }
 
-    public void AddWord(string word, int freq, string tag = null)
+    public void AddWord(string word, int freq, string? tag = null)
     {
         if (ContainsWord(word))
         {

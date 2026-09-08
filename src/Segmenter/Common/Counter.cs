@@ -141,7 +141,7 @@ public class Counter<T>: ICounter<T> where T: notnull
     {
         foreach (var item in items)
         {
-            _data[item] = _data.GetDefault(item, 0) + 1;
+            _data[item] = _data.GetValueOrDefault(item, 0) + 1;
         }
     }
 
@@ -157,7 +157,7 @@ public class Counter<T>: ICounter<T> where T: notnull
     {
         foreach (var item in items)
         {
-            _data[item] = _data.GetDefault(item, 0) - 1;
+            _data[item] = _data.GetValueOrDefault(item, 0) - 1;
         }
     }
 

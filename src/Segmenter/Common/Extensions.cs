@@ -25,27 +25,9 @@ public static partial class Extensions
         return (enumerable != null) && enumerable.Any();
     }
 
-    public static TValue? GetOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> d, TKey key)
+    public static TValue? GetOrDefault<TKey, TValue>(this Dictionary<TKey, TValue> d, TKey key) where TKey : notnull
     {
-        return d.ContainsKey(key) ? d[key] : default(TValue);
-    }
-
-    public static TValue GetDefault<TKey, TValue>(this Dictionary<TKey, TValue> dict, TKey key, TValue defaultValue)
-    {
-        if (dict.ContainsKey(key))
-        {
-            return dict[key];
-        }
-        return defaultValue;
-    }
-        
-    public static IDictionary<TKey, TValue> SetDefault<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key, TValue defaultValue)
-    {
-        if (!dict.ContainsKey(key))
-        {
-            dict[key] = defaultValue;
-        }
-        return dict;
+        return d.TryGetValue(key, out var value) ? value : default;
     }
 
     public static void Update<TKey, TValue>(this IDictionary<TKey, TValue> dict, IDictionary<TKey, TValue> other)

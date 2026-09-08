@@ -67,12 +67,12 @@ public class TfidfExtractor : KeywordExtractor
             {
                 continue;
             }
-            freq[w] = freq.GetDefault(w, 0.0) + 1.0;
+            freq[w] = freq.GetValueOrDefault(w, 0.0) + 1.0;
         }
         var total = freq.Values.Sum();
         foreach (var k in freq.Keys.ToList())
         {
-            freq[k] *= IdfFreq.GetDefault(k, MedianIdf) / total;
+            freq[k] *= IdfFreq.GetValueOrDefault(k, MedianIdf) / total;
         }
 
         return freq;

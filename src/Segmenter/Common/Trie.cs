@@ -8,8 +8,8 @@ namespace JiebaNet.Segmenter.Common;
 public class TrieNode(char ch)
 {
     public char Char { get; set; } = ch;
-    public int Frequency { get; set; } = 0;
-    public Dictionary<char, TrieNode>? Children { get; set; }
+    public int Frequency { get; set; }
+    public Dictionary<char, TrieNode> Children { get; } = new();
 
     public int Insert(string s, int pos, int freq = 1)
     {
@@ -17,8 +17,6 @@ public class TrieNode(char ch)
         {
             return 0;
         }
-
-        Children ??= new Dictionary<char, TrieNode>();
 
         var c = s[pos];
         if (!Children.ContainsKey(c))
@@ -44,7 +42,7 @@ public class TrieNode(char ch)
         }
 
         // if out of range or without any child nodes
-        if (pos >= s.Length || Children == null)
+        if (pos >= s.Length)
         {
             return null;
         }
@@ -75,7 +73,7 @@ public class Trie : ITrie
 
     internal readonly TrieNode Root = new(RootChar);
 
-    public int Count { get; private set; } = 0;
+    public int Count { get; private set; }
     public int TotalFrequency { get; private set; }
 
     public bool Contains(string word)
@@ -116,10 +114,10 @@ public class Trie : ITrie
         return i;
     }
 
-    public IEnumerable<char> ChildChars(string prefix)
+    public IEnumerable<char>? ChildChars(string prefix)
     {
         var node = Root.Search(prefix.Trim(), 0);
-        return node is null || node.Children is null ? null : node.Children.Select(p => p.Key);
+        return node?.Children.Select(p => p.Key);
     }
 
     private void CheckWord(string word)

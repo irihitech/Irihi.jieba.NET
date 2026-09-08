@@ -4,7 +4,7 @@ namespace JiebaNet.Segmenter.Common;
 
 public class KeywordTrieNode
 {
-    private readonly IDictionary<char, KeywordTrieNode> _children;
+    private readonly Dictionary<char, KeywordTrieNode> _children;
     // private string _value;
         
     public KeywordTrieNode(string? value = null)

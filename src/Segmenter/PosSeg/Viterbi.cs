@@ -71,9 +71,9 @@ public class Viterbi
         // Init weights and paths.
         v.Add(new Dictionary<string, double>());
         memPath.Add(new Dictionary<string, string>());
-        foreach (var state in model.StateTab.GetDefault(sentence[0], allStates))
+        foreach (var state in model.StateTab.GetValueOrDefault(sentence[0], allStates))
         {
-            var emP = model.EmitProbs[state].GetDefault(sentence[0], Constants.MinProb);
+            var emP = model.EmitProbs[state].GetValueOrDefault(sentence[0], Constants.MinProb);
             v[0][state] = model.StartProbs[state] + emP;
             memPath[0][state] = string.Empty;
         }
@@ -109,7 +109,7 @@ public class Viterbi
             }
 
             obsStates.Clear();
-            foreach (var s in model.StateTab.GetDefault(sentence[i], allStates))
+            foreach (var s in model.StateTab.GetValueOrDefault(sentence[i], allStates))
             {
                 if (curPossibleStates.Contains(s))
                 {

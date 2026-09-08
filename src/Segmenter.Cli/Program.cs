@@ -76,8 +76,6 @@ public class Program
 
     private static void RunOptions(Options options)
     {
-        var seg = new JiebaSegmenter();
-
         if (options.ShowHelp)
         {
             Console.WriteLine(options.GetUsage());
@@ -106,11 +104,11 @@ public class Program
         var fileName = Path.GetFullPath(options.FileName);
         var lines = File.ReadAllLines(fileName);
 
-        Func<string, bool, bool, IEnumerable<string>> cutMethod = null;
+        Func<string, bool, bool, IEnumerable<string>> cutMethod;
         var segmenter = new JiebaSegmenter();
         if (options.POS)
         {
-            cutMethod = (text, cutAll, hmm) =>
+            cutMethod = (text, _, hmm) =>
             {
                 var posSeg = new PosSegmenter(segmenter);
                 return posSeg.Cut(text, hmm).Select(token => $"{token.Word}/{token.Flag}");

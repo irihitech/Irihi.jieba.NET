@@ -187,7 +187,7 @@ public partial class PosSegmenter(JiebaSegmenter segmenter)
                     AddBufferToWordList(tokens, buf);
                     buf = string.Empty;
                 }
-                tokens.Add(new Pair(w, WordTagTab.GetDefault(w, "x")));
+                tokens.Add(new Pair(w, WordTagTab.GetValueOrDefault(w, "x")));
             }
             x = y;
         }
@@ -230,7 +230,7 @@ public partial class PosSegmenter(JiebaSegmenter segmenter)
                     tokens.Add(new Pair(buf, "eng"));
                     buf = string.Empty;
                 }
-                tokens.Add(new Pair(w, WordTagTab.GetDefault(w, "x")));
+                tokens.Add(new Pair(w, WordTagTab.GetValueOrDefault(w, "x")));
                 x = y;
             }
         }
@@ -288,7 +288,7 @@ public partial class PosSegmenter(JiebaSegmenter segmenter)
     {
         if (buf.Length == 1)
         {
-            words.Add(new Pair(buf, WordTagTab.GetDefault(buf, "x")));
+            words.Add(new Pair(buf, WordTagTab.GetValueOrDefault(buf, "x")));
         }
         else
         {

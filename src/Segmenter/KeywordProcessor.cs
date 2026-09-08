@@ -21,7 +21,7 @@ public class KeywordProcessor
         CaseSensitive = caseSensitive;
     }
         
-    public void AddKeyword(string keyword, string cleanName = null)
+    public void AddKeyword(string keyword, string? cleanName = null)
     {
         SetItem(keyword, cleanName);
     }
@@ -98,7 +98,7 @@ public class KeywordProcessor
                     // re look for longest seq from this position
                     if (currentState.HasChild(ch))
                     {
-                        var curStateContinued = currentState.GetChild(ch);
+                        var curStateContinued = currentState.GetChild(ch)!;
                         var idy = idx + 1;
                         while (idy < sentLen)
                         {
@@ -112,7 +112,7 @@ public class KeywordProcessor
 
                             if(curStateContinued.HasChild(innerCh))
                             {
-                                curStateContinued = curStateContinued.GetChild(innerCh);
+                                curStateContinued = curStateContinued.GetChild(innerCh)!;
                             }
                             else
                             {
@@ -136,7 +136,7 @@ public class KeywordProcessor
                         }
                     }
                         
-                    if (longestFound.IsNotEmpty())
+                    if (!string.IsNullOrEmpty(longestFound))
                     {
                         keywordsExtracted.Add(new TextSpan(Text: longestFound, Start: seqStartPos, End: idx));
                     }
@@ -152,7 +152,7 @@ public class KeywordProcessor
             }
             else if (currentState.HasChild(ch))
             {
-                currentState = currentState.GetChild(ch);
+                currentState = currentState.GetChild(ch)!;
             }
             else
             {
@@ -177,7 +177,7 @@ public class KeywordProcessor
             {
                 if (currentState.HasValue)
                 {
-                    var seqFound = currentState.Value;
+                    var seqFound = currentState.Value!;
                     keywordsExtracted.Add(new TextSpan(Text: seqFound, Start: seqStartPos, End: sentLen));
                 }
             }
@@ -205,9 +205,9 @@ public class KeywordProcessor
 
     #region Private methods
 
-    private void SetItem(string keyword, string cleanName)
+    private void SetItem(string keyword, string? cleanName)
     {
-        if (cleanName.IsEmpty() && keyword.IsNotEmpty())
+        if (string.IsNullOrEmpty(cleanName) && !string.IsNullOrEmpty(keyword))
         {
             cleanName = keyword;
         }

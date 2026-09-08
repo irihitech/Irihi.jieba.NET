@@ -8,7 +8,7 @@ namespace JiebaNet.Segmenter;
 /// Arena-allocated node of the character-level prefix index built over the
 /// main dictionary. Nodes reference each other by index; children use a
 /// small sibling chain while the branching factor is low and upgrade to a
-/// dictionary beyond <see cref="UpgradeThreshold"/> entries.
+/// dictionary beyond <see cref="WordDictIndex.UpgradeThreshold"/> entries.
 /// </summary>
 internal struct WordDictNode
 {

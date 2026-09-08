@@ -47,7 +47,7 @@ public class SpellChecker : ISpellChecker
         var splits = new List<WordSplit>();
         for (var i = 0; i <= word.Length; i++)
         {
-            splits.Add(new WordSplit { Left = word.Substring(0, i), Right = word.Substring(i) });
+            splits.Add(new WordSplit(word.Substring(0, i), word.Substring(i)));
         }
 
         var deletes = splits
@@ -150,8 +150,4 @@ public class SpellChecker : ISpellChecker
     }
 }
 
-internal class WordSplit
-{
-    public string Left { get; set; }
-    public string Right { get; set; }
-}
+internal readonly record struct WordSplit(string Left, string Right);
