@@ -5,20 +5,11 @@ using System.Linq;
 namespace JiebaNet.Segmenter.Common;
 
 // Refer to: https://github.com/brianfromoregon/trie
-public class TrieNode
+public class TrieNode(char ch)
 {
-    public char Char { get; set; }
-    public int Frequency { get; set; }
+    public char Char { get; set; } = ch;
+    public int Frequency { get; set; } = 0;
     public Dictionary<char, TrieNode>? Children { get; set; }
-
-    public TrieNode(char ch)
-    {
-        Char = ch;
-        Frequency = 0;
-            
-        // TODO: or an empty dict?
-        //Children = null;
-    }
 
     public int Insert(string s, int pos, int freq = 1)
     {
@@ -82,16 +73,10 @@ public class Trie : ITrie
 {
     private static readonly char RootChar = '\0';
 
-    internal TrieNode Root;
+    internal readonly TrieNode Root = new(RootChar);
 
-    public int Count { get; private set; }
+    public int Count { get; private set; } = 0;
     public int TotalFrequency { get; private set; }
-
-    public Trie()
-    {
-        Root = new TrieNode(RootChar);
-        Count = 0;
-    }
 
     public bool Contains(string word)
     {

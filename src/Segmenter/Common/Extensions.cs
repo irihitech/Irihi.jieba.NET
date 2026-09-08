@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
 namespace JiebaNet.Segmenter.Common;
@@ -12,12 +13,14 @@ public static partial class Extensions
     
     #region Enumerable
 
-    public static bool IsEmpty<T>(this IEnumerable<T> enumerable)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool IsEmpty<T>(this IEnumerable<T>? enumerable)
     {
         return (enumerable == null) || !enumerable.Any();
     }
 
-    public static bool IsNotEmpty<T>(this IEnumerable<T> enumerable)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool IsNotEmpty<T>(this IEnumerable<T>? enumerable)
     {
         return (enumerable != null) && enumerable.Any();
     }
@@ -27,7 +30,7 @@ public static partial class Extensions
         return d.ContainsKey(key) ? d[key] : default(TValue);
     }
 
-    public static TValue GetDefault<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key, TValue defaultValue)
+    public static TValue GetDefault<TKey, TValue>(this Dictionary<TKey, TValue> dict, TKey key, TValue defaultValue)
     {
         if (dict.ContainsKey(key))
         {
@@ -103,20 +106,6 @@ public static partial class Extensions
         var result = from Group g in groups
             select g.Value;
         return result.Skip(1);
-    }
-
-    #endregion
-
-    #region Conversion
-
-    public static int ToInt32(this char ch)
-    {
-        return ch;
-    }
-
-    public static char ToChar(this int i)
-    {
-        return (char)i;
     }
 
     #endregion

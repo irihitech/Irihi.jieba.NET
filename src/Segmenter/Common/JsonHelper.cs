@@ -10,42 +10,42 @@ namespace JiebaNet.Segmenter.Common;
 /// </summary>
 internal static class JsonHelper
 {
-    public static IDictionary<char, IDictionary<char, double>> DeserializeProbTable(string json)
+    public static Dictionary<char, Dictionary<char, double>> DeserializeProbTable(string json)
     {
         return JsonSerializer.Deserialize(json, JiebaJsonContext.Default.CharProbTable) ??
-               new Dictionary<char, IDictionary<char, double>>();
+               new Dictionary<char, Dictionary<char, double>>();
     }
 
-    public static IDictionary<string, double> DeserializePosProbStart(string json)
+    public static Dictionary<string, double> DeserializePosProbStart(string json)
     {
         return JsonSerializer.Deserialize(json, JiebaJsonContext.Default.StringProbTable) ??
                new Dictionary<string, double>();
     }
 
-    public static IDictionary<string, IDictionary<string, double>> DeserializePosProbTrans(string json)
+    public static Dictionary<string, Dictionary<string, double>> DeserializePosProbTrans(string json)
     {
         return JsonSerializer.Deserialize(json, JiebaJsonContext.Default.StringTransTable) ??
-               new Dictionary<string, IDictionary<string, double>>();
+               new Dictionary<string, Dictionary<string, double>>();
     }
 
-    public static IDictionary<string, IDictionary<char, double>> DeserializePosProbEmit(string json)
+    public static Dictionary<string, Dictionary<char, double>> DeserializePosProbEmit(string json)
     {
         return JsonSerializer.Deserialize(json, JiebaJsonContext.Default.StringCharTable) ??
-               new Dictionary<string, IDictionary<char, double>>();
+               new Dictionary<string, Dictionary<char, double>>();
     }
 
-    public static IDictionary<char, List<string>> DeserializeCharStateTab(string json)
+    public static Dictionary<char, List<string>> DeserializeCharStateTab(string json)
     {
         return JsonSerializer.Deserialize(json, JiebaJsonContext.Default.CharStateTab) ??
                new Dictionary<char, List<string>>();
     }
 }
 
-[JsonSerializable(typeof(IDictionary<char, IDictionary<char, double>>), TypeInfoPropertyName = "CharProbTable")]
-[JsonSerializable(typeof(IDictionary<string, double>), TypeInfoPropertyName = "StringProbTable")]
-[JsonSerializable(typeof(IDictionary<string, IDictionary<string, double>>), TypeInfoPropertyName = "StringTransTable")]
-[JsonSerializable(typeof(IDictionary<string, IDictionary<char, double>>), TypeInfoPropertyName = "StringCharTable")]
-[JsonSerializable(typeof(IDictionary<char, List<string>>), TypeInfoPropertyName = "CharStateTab")]
+[JsonSerializable(typeof(Dictionary<char, Dictionary<char, double>>), TypeInfoPropertyName = "CharProbTable")]
+[JsonSerializable(typeof(Dictionary<string, double>), TypeInfoPropertyName = "StringProbTable")]
+[JsonSerializable(typeof(Dictionary<string, Dictionary<string, double>>), TypeInfoPropertyName = "StringTransTable")]
+[JsonSerializable(typeof(Dictionary<string, Dictionary<char, double>>), TypeInfoPropertyName = "StringCharTable")]
+[JsonSerializable(typeof(Dictionary<char, List<string>>), TypeInfoPropertyName = "CharStateTab")]
 internal partial class JiebaJsonContext : JsonSerializerContext
 {
 }

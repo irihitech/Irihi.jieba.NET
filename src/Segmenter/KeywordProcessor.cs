@@ -223,7 +223,7 @@ public class KeywordProcessor
         }
     }
         
-    private string GetItem(string word)
+    private string? GetItem(string word)
     {
         if (!CaseSensitive)
         {

@@ -10,7 +10,7 @@ public class WordDictionary
 {
     private static readonly Lazy<WordDictionary> lazy = new(() => new WordDictionary());
 
-    internal IDictionary<string, int> Trie = new Dictionary<string, int>();
+    internal readonly IDictionary<string, int> Trie = new Dictionary<string, int>();
 
     /// <summary>
     /// Character-level prefix index over the same data as <see cref="Trie"/>,

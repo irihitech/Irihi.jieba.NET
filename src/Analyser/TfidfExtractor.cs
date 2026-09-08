@@ -14,7 +14,7 @@ public class TfidfExtractor : KeywordExtractor
     private PosSegmenter PosSegmenter { get; set; }
     private IdfLoader Loader { get; set; }
 
-    private IDictionary<string, double> IdfFreq { get; set; }
+    private Dictionary<string, double> IdfFreq { get; set; }
     private double MedianIdf { get; set; }
 
     public TfidfExtractor(JiebaSegmenter? segmenter = null)

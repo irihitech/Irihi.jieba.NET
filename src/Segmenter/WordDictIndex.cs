@@ -54,7 +54,7 @@ internal sealed class WordDictIndex
         ref var p = ref NodeRef(parent);
         if (p.DictIndex >= 0)
         {
-            return _childrenDicts[p.DictIndex].TryGetValue(ch, out var found) ? found : -1;
+            return _childrenDicts[p.DictIndex].GetValueOrDefault(ch, -1);
         }
 
         for (var child = p.FirstChild; child >= 0; child = NodeRef(child).NextSibling)

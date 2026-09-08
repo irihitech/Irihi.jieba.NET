@@ -3,37 +3,28 @@ using System.Linq;
 
 namespace JiebaNet.Analyser;
 
-public class Edge
-{
-    public string Start { get; set; }
-    public string End { get; set; }
-    public double Weight { get; set; }
-}
+internal readonly record struct Edge(string Start, string End, double Weight);
 
-public class UndirectWeightedGraph
+internal class UndirectWeightedGraph
 {
     private static readonly double d = 0.85;
 
-    public IDictionary<string, List<Edge>> Graph { get; set; } 
-    public UndirectWeightedGraph()
-    {
-        Graph = new Dictionary<string, List<Edge>>();
-    }
+    private readonly Dictionary<string, List<Edge>> _graph = new();
 
     public void AddEdge(string start, string end, double weight)
     {
-        if (!Graph.ContainsKey(start))
+        if (!_graph.ContainsKey(start))
         {
-            Graph[start] = new List<Edge>();
+            _graph[start] = new List<Edge>();
         }
 
-        if (!Graph.ContainsKey(end))
+        if (!_graph.ContainsKey(end))
         {
-            Graph[end] = new List<Edge>();
+            _graph[end] = new List<Edge>();
         }
 
-        Graph[start].Add(new Edge { Start = start, End = end, Weight = weight });
-        Graph[end].Add(new Edge { Start = end, End = start, Weight = weight });
+        _graph[start].Add(new Edge(start, end, weight));
+        _graph[end].Add(new Edge(end, start, weight));
     }
 
     public IDictionary<string, double> Rank()
@@ -42,23 +33,23 @@ public class UndirectWeightedGraph
         var outSum = new Dictionary<string, double>();
 
         // init scores
-        var count = Graph.Count > 0 ? Graph.Count : 1;
+        var count = _graph.Count > 0 ? _graph.Count : 1;
         var wsdef = 1.0/count;
 
-        foreach (var pair in Graph)
+        foreach (var pair in _graph)
         {
             ws[pair.Key] = wsdef;
             outSum[pair.Key] = pair.Value.Sum(e => e.Weight);
         }
 
         // TODO: 10 iterations?
-        var sortedKeys = Graph.Keys.OrderBy(k => k);
+        var sortedKeys = _graph.Keys.OrderBy(k => k).ToList();
         for (var i = 0; i < 10; i++)
         {
             foreach (var n in sortedKeys)
             {
                 var s = 0d;
-                foreach (var edge in Graph[n])
+                foreach (var edge in _graph[n])
                 {
                     s += edge.Weight/outSum[edge.End]*ws[edge.End];
                 }

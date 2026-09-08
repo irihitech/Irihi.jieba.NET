@@ -41,7 +41,7 @@ public partial class JiebaSegmenter
 
     /// <summary>
     /// The main function that segments an entire sentence that contains 
-    /// Chinese characters into seperated words.
+    /// Chinese characters into separated words.
     /// </summary>
     /// <param name="text">The string to be segmented.</param>
     /// <param name="cutAll">Specify segmentation pattern. True for full pattern, False for accurate pattern.</param>
@@ -171,10 +171,10 @@ public partial class JiebaSegmenter
         var index = WordDict.Index;
         var root = index.Root;
 
-        var N = sentence.Length;
-        var dag = new WordEnd[N][];
+        var n = sentence.Length;
+        var dag = new WordEnd[n][];
         var scratch = new List<WordEnd>();
-        for (var k = 0; k < N; k++)
+        for (var k = 0; k < n; k++)
         {
             scratch.Clear();
             var node = index.GetChild(root, sentence[k]);
@@ -187,7 +187,7 @@ public partial class JiebaSegmenter
                 }
 
                 i++;
-                if (i < N)
+                if (i < n)
                 {
                     node = index.GetChild(node, sentence[i]);
                 }

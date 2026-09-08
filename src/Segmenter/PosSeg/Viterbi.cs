@@ -200,8 +200,8 @@ public class Viterbi
     #endregion
 
     private sealed record Probs(
-        IDictionary<string, double> StartProbs,
-        IDictionary<string, IDictionary<string, double>> TransProbs,
-        IDictionary<string, IDictionary<char, double>> EmitProbs,
-        IDictionary<char, List<string>> StateTab);
+        Dictionary<string, double> StartProbs,
+        Dictionary<string, Dictionary<string, double>> TransProbs,
+        Dictionary<string, Dictionary<char, double>> EmitProbs,
+        Dictionary<char, List<string>> StateTab);
 }

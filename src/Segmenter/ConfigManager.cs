@@ -11,7 +11,7 @@ public class ConfigManager
 
     private const string EmbeddedResourcePrefix = "JiebaNet.Segmenter.Resources.";
 
-    private static string? _customConfigFileBaseDir = null;
+    private static string? _customConfigFileBaseDir;
 
     /// <summary>
     /// Custom directory of the dictionary and model files. When it is set (or the
@@ -34,7 +34,7 @@ public class ConfigManager
 
             return dir;
         }
-        set { _customConfigFileBaseDir = value; }
+        set => _customConfigFileBaseDir = value;
     }
 
     /// <summary>
@@ -42,18 +42,13 @@ public class ConfigManager
     /// or the environment variable), in which case data files are read from disk
     /// instead of the embedded resources.
     /// </summary>
-    public static bool HasCustomConfigFileDir
-    {
-        get
-        {
-            return _customConfigFileBaseDir != null
-                   || Environment.GetEnvironmentVariable(ConfigFileDirEnvVar) != null
-                   || Environment.GetEnvironmentVariable(LegacyConfigFileDirEnvVar) != null;
-        }
-    }
+    public static bool HasCustomConfigFileDir =>
+        _customConfigFileBaseDir != null
+        || Environment.GetEnvironmentVariable(ConfigFileDirEnvVar) != null
+        || Environment.GetEnvironmentVariable(LegacyConfigFileDirEnvVar) != null;
 
     /// <summary>
-    /// Opens the named data file. By default it is read from the embedded resources;
+    /// Opens the named data file. By default, it is read from the embedded resources;
     /// when a custom config directory is in effect, the file is read from that directory.
     /// </summary>
     public static Stream OpenResource(string fileName)
@@ -79,40 +74,19 @@ public class ConfigManager
         return reader.ReadToEnd();
     }
 
-    public static string MainDictFile
-    {
-        get { return Path.Combine(ConfigFileBaseDir, "dict.txt"); }
-    }
+    public static string MainDictFile => Path.Combine(ConfigFileBaseDir, "dict.txt");
 
-    public static string ProbTransFile
-    {
-        get { return Path.Combine(ConfigFileBaseDir, "prob_trans.json"); }
-    }
+    public static string ProbTransFile => Path.Combine(ConfigFileBaseDir, "prob_trans.json");
 
-    public static string ProbEmitFile
-    {
-        get { return Path.Combine(ConfigFileBaseDir, "prob_emit.json"); }
-    }
+    public static string ProbEmitFile => Path.Combine(ConfigFileBaseDir, "prob_emit.json");
 
-    public static string PosProbStartFile
-    {
-        get { return Path.Combine(ConfigFileBaseDir, "pos_prob_start.json"); }
-    }
+    public static string PosProbStartFile => Path.Combine(ConfigFileBaseDir, "pos_prob_start.json");
 
-    public static string PosProbTransFile
-    {
-        get { return Path.Combine(ConfigFileBaseDir, "pos_prob_trans.json"); }
-    }
+    public static string PosProbTransFile => Path.Combine(ConfigFileBaseDir, "pos_prob_trans.json");
 
-    public static string PosProbEmitFile
-    {
-        get { return Path.Combine(ConfigFileBaseDir, "pos_prob_emit.json"); }
-    }
+    public static string PosProbEmitFile => Path.Combine(ConfigFileBaseDir, "pos_prob_emit.json");
 
-    public static string CharStateTabFile
-    {
-        get { return Path.Combine(ConfigFileBaseDir, "char_state_tab.json"); }
-    }
+    public static string CharStateTabFile => Path.Combine(ConfigFileBaseDir, "char_state_tab.json");
 
     public static string IdfFile => Path.Combine(ConfigFileBaseDir, "idf.txt");
 

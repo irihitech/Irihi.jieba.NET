@@ -115,15 +115,7 @@ public partial class PosSegmenter(JiebaSegmenter segmenter)
         CheckNewUserWordTags();
 
         var blocks = RegexChineseInternal().Split(text);
-        Func<string, IEnumerable<Pair>> cutMethod = null;
-        if (hmm)
-        {
-            cutMethod = CutDag;
-        }
-        else
-        {
-            cutMethod = CutDagWithoutHmm;
-        }
+        Func<string, IEnumerable<Pair>> cutMethod = hmm ? CutDag : CutDagWithoutHmm;
 
         var tokens = new List<Pair>();
         foreach (var blk in blocks)
@@ -221,10 +213,9 @@ public partial class PosSegmenter(JiebaSegmenter segmenter)
         var buf = string.Empty;
         var n = sentence.Length;
 
-        var y = -1;
         while (x < n)
         {
-            y = routeEnd[x] + 1;
+            var y = routeEnd[x] + 1;
             var w = sentence.Substring(x, y - x);
             // TODO: char or word?
             if (RegexEnglishChar().IsMatch(w))

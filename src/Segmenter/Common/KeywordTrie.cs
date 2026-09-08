@@ -33,7 +33,7 @@ public class KeywordTrieNode
         return child;
     }
         
-    public KeywordTrieNode GetChild(char ch)
+    public KeywordTrieNode? GetChild(char ch)
     {
         var child = _children.GetOrDefault(ch);
         return child;
@@ -65,17 +65,17 @@ public class KeywordTrie: KeywordTrieNode
         this[key] = null;
     }
 
-    public string this[string key]
+    public string? this[string key]
     {
-        get { return GetItem(key); }
-        set { SetItem(key, value); }
+        get => GetItem(key);
+        set => SetItem(key, value);
     }
 
     #region Private Methods
 
     private string? GetItem(string key)
     {
-        KeywordTrieNode state = this;
+        KeywordTrieNode? state = this;
         foreach (var ch in key)
         {
             state = state.GetChild(ch);
@@ -88,7 +88,7 @@ public class KeywordTrie: KeywordTrieNode
         return state.Value;
     }
 
-    private void SetItem(string key, string value)
+    private void SetItem(string key, string? value)
     {
         KeywordTrieNode state = this;
         for (int i = 0; i < key.Length; i++)

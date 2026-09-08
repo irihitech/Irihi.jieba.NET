@@ -9,7 +9,7 @@ namespace JiebaNet.Analyser;
 public class IdfLoader
 {
     internal string IdfFilePath { get; set; }
-    internal IDictionary<string, double> IdfFreq { get; set; }
+    internal Dictionary<string, double> IdfFreq { get; set; }
     internal double MedianIdf { get; set; }
 
     /// <summary>
