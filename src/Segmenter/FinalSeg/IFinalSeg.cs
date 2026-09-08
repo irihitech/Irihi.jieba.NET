@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
 
-namespace JiebaNet.Segmenter.FinalSeg
+namespace JiebaNet.Segmenter.FinalSeg;
+
+/// <summary>
+/// 锟节词碉拷锟叫凤拷之锟斤拷使锟矫此接口斤拷锟斤拷锟叫分ｏ拷默锟斤拷实锟斤拷为HMM锟斤拷锟斤拷锟斤拷
+/// </summary>
+public interface IFinalSeg
 {
-    /// <summary>
-    /// 在词典切分之后，使用此接口进行切分，默认实现为HMM方法。
-    /// </summary>
-    public interface IFinalSeg
-    {
-        IEnumerable<string> Cut(string sentence);
-    }
+    IEnumerable<string> Cut(string sentence);
 }
