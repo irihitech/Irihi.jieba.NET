@@ -23,8 +23,7 @@ public abstract class KeywordExtractor
         StopWords = new HashSet<string>();
 
         using var reader = new StreamReader(ConfigManager.OpenResource("stopwords.txt"));
-        string line;
-        while ((line = reader.ReadLine()) != null)
+        while (reader.ReadLine() is { } line)
         {
             StopWords.Add(line.Trim());
         }

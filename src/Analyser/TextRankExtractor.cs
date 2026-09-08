@@ -49,10 +49,7 @@ public class TextRankExtractor : KeywordExtractor
     {
         var rank = ExtractTagRank(text, allowPos);
         if (count <= 0) { count = 20; }
-        return rank.OrderByDescending(p => p.Value).Select(p => new WordWeightPair
-        {
-            Word = p.Key, Weight = p.Value
-        }).Take(count);
+        return rank.OrderByDescending(p => p.Value).Select(p => new WordWeightPair(p.Key, p.Value)).Take(count);
     }
 
     #region Private Helpers

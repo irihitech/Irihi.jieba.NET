@@ -46,10 +46,10 @@ public class TfidfExtractor : KeywordExtractor
         return posTags.Select(p => p.Word);
     }
 
-    private IDictionary<string, double> GetWordIfidf(string text, ICollection<string> allowPos)
+    private IDictionary<string, double> GetWordIfidf(string text, ICollection<string>? allowPos)
     {
-        IEnumerable<string> words = null;
-        if (allowPos.IsNotEmpty())
+        IEnumerable<string>? words;
+        if (allowPos is not null)
         {
             words = FilterCutByPos(text, allowPos);
         }
@@ -91,15 +91,8 @@ public class TfidfExtractor : KeywordExtractor
         if (count <= 0) { count = DefaultWordCount; }
 
         var freq = GetWordIfidf(text, allowPos);
-        return freq.OrderByDescending(p => p.Value).Select(p => new WordWeightPair
-        {
-            Word = p.Key, Weight = p.Value
-        }).Take(count);
+        return freq.OrderByDescending(p => p.Value).Select(p => new WordWeightPair(p.Key, p.Value)).Take(count);
     }
 }
 
-public class WordWeightPair
-{
-    public string Word { get; set; }
-    public double Weight { get; set; }
-}
+public record WordWeightPair(string Word, double Weight);

@@ -12,27 +12,32 @@ internal static class JsonHelper
 {
     public static IDictionary<char, IDictionary<char, double>> DeserializeProbTable(string json)
     {
-        return JsonSerializer.Deserialize(json, JiebaJsonContext.Default.CharProbTable);
+        return JsonSerializer.Deserialize(json, JiebaJsonContext.Default.CharProbTable) ??
+               new Dictionary<char, IDictionary<char, double>>();
     }
 
     public static IDictionary<string, double> DeserializePosProbStart(string json)
     {
-        return JsonSerializer.Deserialize(json, JiebaJsonContext.Default.StringProbTable);
+        return JsonSerializer.Deserialize(json, JiebaJsonContext.Default.StringProbTable) ??
+               new Dictionary<string, double>();
     }
 
     public static IDictionary<string, IDictionary<string, double>> DeserializePosProbTrans(string json)
     {
-        return JsonSerializer.Deserialize(json, JiebaJsonContext.Default.StringTransTable);
+        return JsonSerializer.Deserialize(json, JiebaJsonContext.Default.StringTransTable) ??
+               new Dictionary<string, IDictionary<string, double>>();
     }
 
     public static IDictionary<string, IDictionary<char, double>> DeserializePosProbEmit(string json)
     {
-        return JsonSerializer.Deserialize(json, JiebaJsonContext.Default.StringCharTable);
+        return JsonSerializer.Deserialize(json, JiebaJsonContext.Default.StringCharTable) ??
+               new Dictionary<string, IDictionary<char, double>>();
     }
 
     public static IDictionary<char, List<string>> DeserializeCharStateTab(string json)
     {
-        return JsonSerializer.Deserialize(json, JiebaJsonContext.Default.CharStateTab);
+        return JsonSerializer.Deserialize(json, JiebaJsonContext.Default.CharStateTab) ??
+               new Dictionary<char, List<string>>();
     }
 }
 
