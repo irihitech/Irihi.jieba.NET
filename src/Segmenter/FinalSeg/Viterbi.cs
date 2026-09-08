@@ -11,7 +11,17 @@ namespace JiebaNet.Segmenter.FinalSeg
     public partial class Viterbi : IFinalSeg
     {
         private static readonly Lazy<Viterbi> Lazy = new Lazy<Viterbi>(() => new Viterbi());
+
+        // State order used by every array below: B = 0, M = 1, E = 2, S = 3.
         private static readonly char[] States = { 'B', 'M', 'E', 'S' };
+
+        private static readonly int[][] PrevStatusIndexes =
+        {
+            new[] { 2, 3 },  // B <- E, S
+            new[] { 1, 0 },  // M <- M, B
+            new[] { 0, 1 },  // E <- B, M
+            new[] { 3, 2 },  // S <- S, E
+        };
 
         [GeneratedRegex(@"([\u4E00-\u9FD5]+)")]
         private static partial Regex RegexChinese();
@@ -19,10 +29,9 @@ namespace JiebaNet.Segmenter.FinalSeg
         [GeneratedRegex(@"([a-zA-Z0-9]+(?:\.\d+)?%?)")]
         private static partial Regex RegexSkip();
 
-        private static IDictionary<char, IDictionary<char, double>> _emitProbs;
-        private static IDictionary<char, double> _startProbs;
-        private static IDictionary<char, IDictionary<char, double>> _transProbs;
-        private static IDictionary<char, char[]> _prevStatus;
+        private static Dictionary<char, double>[] _emitProbs;  // [state] -> char of sentence -> prob
+        private static double[] _startProbs;                    // [state]
+        private static double[][] _transProbs;                  // [prev][cur]
 
         private Viterbi()
         {
@@ -60,27 +69,37 @@ namespace JiebaNet.Segmenter.FinalSeg
             var stopWatch = new Stopwatch();
             stopWatch.Start();
 
-            _prevStatus = new Dictionary<char, char[]>()
+            _startProbs = new[]
             {
-                {'B', new []{'E', 'S'}},
-                {'M', new []{'M', 'B'}},
-                {'S', new []{'S', 'E'}},
-                {'E', new []{'B', 'M'}}
-            };
-
-            _startProbs = new Dictionary<char, double>()
-            {
-                {'B', -0.26268660809250016},
-                {'E', -3.14e+100},
-                {'M', -3.14e+100},
-                {'S', -1.4652633398537678}
+                -0.26268660809250016,  // B
+                -3.14e+100,            // M
+                -3.14e+100,            // E
+                -1.4652633398537678    // S
             };
 
             var transJson = ConfigManager.ReadResourceText("prob_trans.json");
-            _transProbs = JsonHelper.DeserializeProbTable(transJson);
+            var transTable = JsonHelper.DeserializeProbTable(transJson);
 
             var emitJson = ConfigManager.ReadResourceText("prob_emit.json");
-            _emitProbs = JsonHelper.DeserializeProbTable(emitJson);
+            var emitTable = JsonHelper.DeserializeProbTable(emitJson);
+
+            _transProbs = new double[4][];
+            _emitProbs = new Dictionary<char, double>[4];
+            for (var si = 0; si < 4; si++)
+            {
+                var state = States[si];
+
+                var row = new double[4];
+                for (var sj = 0; sj < 4; sj++)
+                {
+                    row[sj] = transTable[state].TryGetValue(States[sj], out var tranValue)
+                        ? tranValue
+                        : Constants.MinProb;
+                }
+                _transProbs[si] = row;
+
+                _emitProbs[si] = new Dictionary<char, double>(emitTable[state]);
+            }
 
             stopWatch.Stop();
             Debug.WriteLine("model loading finished, time elapsed {0} ms.", stopWatch.ElapsedMilliseconds);
@@ -88,61 +107,59 @@ namespace JiebaNet.Segmenter.FinalSeg
 
         private IEnumerable<string> ViterbiCut(string sentence)
         {
-            var v = new List<Dictionary<char, double>>();
-            IDictionary<char, Node> path = new Dictionary<char, Node>();
+            var n = sentence.Length;
+            var v = new double[n * 4];
+            var bestPrev = new int[n * 4];
 
-            // Init weights and paths.
-            v.Add(new Dictionary<char, double>());
-            foreach (var state in States)
+            // Init weights of the first char.
+            for (var si = 0; si < 4; si++)
             {
-                var emP = _emitProbs[state].TryGetValue(sentence[0], out var startEmit)
-                    ? startEmit
+                var emp = _emitProbs[si].TryGetValue(sentence[0], out var emitValue)
+                    ? emitValue
                     : Constants.MinProb;
-                v[0][state] = _startProbs[state] + emP;
-                path[state] = new Node(state, null);
+                v[si] = _startProbs[si] + emp;
             }
 
             // For each remaining char
-            for (var i = 1; i < sentence.Length; ++i)
+            for (var i = 1; i < n; i++)
             {
-                var vPrev = v[i - 1];
-                var vv = new Dictionary<char, double>();
-                v.Add(vv);
-                IDictionary<char, Node> newPath = new Dictionary<char, Node>();
-                foreach (var y in States)
+                var baseCur = i * 4;
+                var basePrev = baseCur - 4;
+                var ch = sentence[i];
+                for (var si = 0; si < 4; si++)
                 {
-                    var emp = _emitProbs[y].TryGetValue(sentence[i], out var emitValue)
+                    var emp = _emitProbs[si].TryGetValue(ch, out var emitValue)
                         ? emitValue
                         : Constants.MinProb;
 
-                    Pair<char> candidate = new Pair<char>('\0', double.MinValue);
-                    foreach (var y0 in _prevStatus[y])
+                    var best = double.MinValue;
+                    var bestPrevState = 0;
+                    foreach (var y0 in PrevStatusIndexes[si])
                     {
-                        var tranp = _transProbs[y0].TryGetValue(y, out var tranValue)
-                            ? tranValue
-                            : Constants.MinProb;
-                        tranp = vPrev[y0] + tranp + emp;
-                        if (candidate.Freq <= tranp)
+                        var prob = v[basePrev + y0] + _transProbs[y0][si] + emp;
+                        if (best <= prob)
                         {
-                            candidate.Freq = tranp;
-                            candidate.Key = y0;
+                            best = prob;
+                            bestPrevState = y0;
                         }
                     }
-                    vv[y] = candidate.Freq;
-                    newPath[y] = new Node(y, path[candidate.Key]);
+
+                    v[baseCur + si] = best;
+                    bestPrev[baseCur + si] = bestPrevState;
                 }
-                path = newPath;
             }
 
-            var probE = v[sentence.Length - 1]['E'];
-            var probS = v[sentence.Length - 1]['S'];
-            var finalPath = probE < probS ? path['S'] : path['E'];
+            var lastBase = (n - 1) * 4;
+            var probE = v[lastBase + 2];
+            var probS = v[lastBase + 3];
+            var state = probE < probS ? 3 : 2;
 
-            var posList = new List<char>(sentence.Length);
-            while (finalPath != null)
+            var posList = new List<char>(n);
+            posList.Add(States[state]);
+            for (var i = n - 1; i > 0; i--)
             {
-                posList.Add(finalPath.Value);
-                finalPath = finalPath.Parent;
+                state = bestPrev[i * 4 + state];
+                posList.Add(States[state]);
             }
             posList.Reverse();
 

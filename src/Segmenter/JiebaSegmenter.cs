@@ -86,10 +86,9 @@ namespace JiebaNet.Segmenter
                 {
                     for (var i = 0; i < w.Length - 1; i++)
                     {
-                        var gram2 = w.Substring(i, 2);
-                        if (WordDict.ContainsWord(gram2))
+                        if (WordDict.ContainsWord(w.AsSpan(i, 2)))
                         {
-                            result.Add(gram2);
+                            result.Add(w.Substring(i, 2));
                         }
                     }
                 }
@@ -98,10 +97,9 @@ namespace JiebaNet.Segmenter
                 {
                     for (var i = 0; i < w.Length - 2; i++)
                     {
-                        var gram3 = w.Substring(i, 3);
-                        if (WordDict.ContainsWord(gram3))
+                        if (WordDict.ContainsWord(w.AsSpan(i, 3)))
                         {
-                            result.Add(gram3);
+                            result.Add(w.Substring(i, 3));
                         }
                     }
                 }
@@ -146,10 +144,9 @@ namespace JiebaNet.Segmenter
                     {
                         for (var i = 0; i < width - 1; i++)
                         {
-                            var gram2 = w.Substring(i, 2);
-                            if (WordDict.ContainsWord(gram2))
+                            if (WordDict.ContainsWord(w.AsSpan(i, 2)))
                             {
-                                result.Add(new Token(gram2, start + i, start + i + 2));
+                                result.Add(new Token(w.Substring(i, 2), start + i, start + i + 2));
                             }
                         }
                     }
@@ -157,10 +154,9 @@ namespace JiebaNet.Segmenter
                     {
                         for (var i = 0; i < width - 2; i++)
                         {
-                            var gram3 = w.Substring(i, 3);
-                            if (WordDict.ContainsWord(gram3))
+                            if (WordDict.ContainsWord(w.AsSpan(i, 3)))
                             {
-                                result.Add(new Token(gram3, start + i, start + i + 3));
+                                result.Add(new Token(w.Substring(i, 3), start + i, start + i + 3));
                             }
                         }
                     }
@@ -175,28 +171,30 @@ namespace JiebaNet.Segmenter
 
         #region Internal Cut Methods
 
-        internal IDictionary<int, List<WordEnd>> GetDag(string sentence)
+        internal WordEnd[][] GetDag(string sentence)
         {
-            var dag = new Dictionary<int, List<WordEnd>>();
-            var root = WordDict.Root;
+            var index = WordDict.Index;
+            var root = index.Root;
 
             var N = sentence.Length;
+            var dag = new WordEnd[N][];
+            var scratch = new List<WordEnd>();
             for (var k = 0; k < N; k++)
             {
-                var templist = new List<WordEnd>();
-                var node = root.GetChild(sentence[k]);
+                scratch.Clear();
+                var node = index.GetChild(root, sentence[k]);
                 var i = k;
-                while (node != null)
+                while (node >= 0)
                 {
-                    if (node.Freq > 0)
+                    if (index.IsWordEnd(node))
                     {
-                        templist.Add(new WordEnd(i, node.LogFreq));
+                        scratch.Add(new WordEnd(i, index.GetLogFreq(node)));
                     }
 
                     i++;
                     if (i < N)
                     {
-                        node = node.GetChild(sentence[i]);
+                        node = index.GetChild(node, sentence[i]);
                     }
                     else
                     {
@@ -204,22 +202,22 @@ namespace JiebaNet.Segmenter
                     }
                 }
 
-                if (templist.Count == 0)
+                if (scratch.Count == 0)
                 {
-                    templist.Add(new WordEnd(k, 0.0));
+                    scratch.Add(new WordEnd(k, 0.0));
                 }
 
-                dag[k] = templist;
+                dag[k] = scratch.ToArray();
             }
 
             return dag;
         }
 
-        internal IDictionary<int, Pair<int>> Calc(string sentence, IDictionary<int, List<WordEnd>> dag)
+        internal void Calc(WordEnd[][] dag, int[] routeEnd, double[] routeFreq)
         {
-            var n = sentence.Length;
-            var route = new Dictionary<int, Pair<int>>(n + 1);
-            route[n] = new Pair<int>(0, 0.0);
+            var n = dag.Length;
+            routeEnd[n] = 0;
+            routeFreq[n] = 0.0;
 
             var logtotal = Math.Log(WordDict.Total);
             for (var i = n - 1; i > -1; i--)
@@ -228,7 +226,7 @@ namespace JiebaNet.Segmenter
                 var bestFreq = double.MinValue;
                 foreach (var candidate in dag[i])
                 {
-                    var freq = candidate.LogFreq - logtotal + route[candidate.End + 1].Freq;
+                    var freq = candidate.LogFreq - logtotal + routeFreq[candidate.End + 1];
                     if (bestFreq < freq)
                     {
                         bestFreq = freq;
@@ -236,10 +234,9 @@ namespace JiebaNet.Segmenter
                     }
                 }
 
-                route[i] = new Pair<int>(bestKey, bestFreq);
+                routeEnd[i] = bestKey;
+                routeFreq[i] = bestFreq;
             }
-
-            return route;
         }
 
         internal IEnumerable<string> CutAll(string sentence)
@@ -249,11 +246,10 @@ namespace JiebaNet.Segmenter
             var words = new List<string>();
             var lastPos = -1;
 
-            foreach (var pair in dag)
+            for (var k = 0; k < dag.Length; k++)
             {
-                var k = pair.Key;
-                var nexts = pair.Value;
-                if (nexts.Count == 1 && k > lastPos)
+                var nexts = dag[k];
+                if (nexts.Length == 1 && k > lastPos)
                 {
                     words.Add(sentence.Substring(k, nexts[0].End + 1 - k));
                     lastPos = nexts[0].End;
@@ -277,7 +273,9 @@ namespace JiebaNet.Segmenter
         internal IEnumerable<string> CutDag(string sentence)
         {
             var dag = GetDag(sentence);
-            var route = Calc(sentence, dag);
+            var routeEnd = new int[sentence.Length + 1];
+            var routeFreq = new double[sentence.Length + 1];
+            Calc(dag, routeEnd, routeFreq);
 
             var tokens = new List<string>();
 
@@ -286,7 +284,7 @@ namespace JiebaNet.Segmenter
             var buf = new StringBuilder();
             while (x < n)
             {
-                var y = route[x].Key + 1;
+                var y = routeEnd[x] + 1;
                 var w = sentence.Substring(x, y - x);
                 if (y - x == 1)
                 {
@@ -315,7 +313,9 @@ namespace JiebaNet.Segmenter
         internal IEnumerable<string> CutDagWithoutHmm(string sentence)
         {
             var dag = GetDag(sentence);
-            var route = Calc(sentence, dag);
+            var routeEnd = new int[sentence.Length + 1];
+            var routeFreq = new double[sentence.Length + 1];
+            Calc(dag, routeEnd, routeFreq);
 
             var words = new List<string>();
 
@@ -326,7 +326,7 @@ namespace JiebaNet.Segmenter
             var y = -1;
             while (x < N)
             {
-                y = route[x].Key + 1;
+                y = routeEnd[x] + 1;
                 var lWord = sentence.Substring(x, y - x);
                 if (lWord.Length == 1 && IsEnglishChar(lWord[0]))
                 {

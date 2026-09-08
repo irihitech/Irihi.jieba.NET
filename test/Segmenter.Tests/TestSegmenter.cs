@@ -21,12 +21,12 @@ namespace JiebaNet.Segmenter.Tests
         {
             var seg = new JiebaSegmenter();
             var dag = seg.GetDag("语言学家参加学术会议");
-            foreach (var key in dag.Keys.ToList().OrderBy(k => k))
+            for (var key = 0; key < dag.Length; key++)
             {
                 Console.Write("{0}: ", key);
-                foreach (var i in dag[key])
+                foreach (var wordEnd in dag[key])
                 {
-                    Console.Write("{0} ", i);
+                    Console.Write("{0} ", wordEnd.End);
                 }
                 Console.WriteLine();
             }
@@ -38,12 +38,13 @@ namespace JiebaNet.Segmenter.Tests
             var s = "语言学家参加学术会议";
             var seg = new JiebaSegmenter();
             var dag = seg.GetDag(s);
-            var route = seg.Calc(s, dag);
-            foreach (var key in route.Keys.ToList().OrderBy(k => k))
+            var routeEnd = new int[s.Length + 1];
+            var routeFreq = new double[s.Length + 1];
+            seg.Calc(dag, routeEnd, routeFreq);
+            for (var key = 0; key < routeEnd.Length; key++)
             {
                 Console.Write("{0}: ", key);
-                var pair = route[key];
-                Console.WriteLine("({0}, {1})", pair.Freq, pair.Key);
+                Console.WriteLine("({0}, {1})", routeFreq[key], routeEnd[key]);
             }
         }
 
