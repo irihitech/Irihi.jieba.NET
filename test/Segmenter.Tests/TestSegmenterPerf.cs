@@ -5,112 +5,111 @@ using System.IO;
 using JiebaNet.Segmenter.Common;
 using NUnit.Framework;
 
-namespace JiebaNet.Segmenter.Tests
+namespace JiebaNet.Segmenter.Tests;
+
+[TestFixture]
+[Ignore("TODO")]
+public class TestSegmenterPerf
 {
-    [TestFixture]
-    [Ignore("TODO")]
-    public class TestSegmenterPerf
+    private string[] GetTestText()
     {
-        private string[] GetTestText()
+        return File.ReadAllLines(TestHelper.GetCaseFilePath("jieba_test.txt"));
+    }
+
+    private string[] GetTestSentences()
+    {
+        var sentences = File.ReadAllText(TestHelper.GetCaseFilePath("jieba_test.txt"));
+        var more = new List<string>();
+        for (int i = 0; i < 1000; i++)
         {
-            return File.ReadAllLines(TestHelper.GetCaseFilePath("jieba_test.txt"));
+            more.Add(sentences);
         }
 
-        private string[] GetTestSentences()
-        {
-            var sentences = File.ReadAllText(TestHelper.GetCaseFilePath("jieba_test.txt"));
-            var more = new List<string>();
-            for (int i = 0; i < 1000; i++)
-            {
-                more.Add(sentences);
-            }
+        return more.ToArray();
+    }
 
-            return more.ToArray();
+    [TestCase]
+    public void TestCutLargeFile()
+    {
+        var fileName = TestHelper.GetResourceFilePath("围城.txt");
+        var weiCheng = File.ReadAllText(fileName);
+        var fileSize = (new FileInfo(fileName)).Length;
+
+        var seg = new JiebaSegmenter();
+        seg.Cut("热身一下");
+
+        Console.WriteLine("Start to cut");
+        const int n = 2;
+        var stopWatch = new Stopwatch();
+
+        // Accurate mode
+        stopWatch.Start();
+
+        for (var i = 0; i < n; i++)
+        {
+            seg.Cut(weiCheng);
         }
 
-        [TestCase]
-        public void TestCutLargeFile()
+        stopWatch.Stop();
+        var timeConsumed = (double)stopWatch.ElapsedMilliseconds / (1000 * n);
+        Console.WriteLine("Accurate mode: {0} ms, average: {1} / second",
+            timeConsumed, fileSize / timeConsumed);
+
+        // Full mode
+        stopWatch.Reset();
+        stopWatch.Start();
+
+        for (var i = 0; i < n; i++)
         {
-            var fileName = TestHelper.GetResourceFilePath("围城.txt");
-            var weiCheng = File.ReadAllText(fileName);
-            var fileSize = (new FileInfo(fileName)).Length;
-
-            var seg = new JiebaSegmenter();
-            seg.Cut("热身一下");
-
-            Console.WriteLine("Start to cut");
-            const int n = 2;
-            var stopWatch = new Stopwatch();
-
-            // Accurate mode
-            stopWatch.Start();
-
-            for (var i = 0; i < n; i++)
-            {
-                seg.Cut(weiCheng);
-            }
-
-            stopWatch.Stop();
-            var timeConsumed = (double)stopWatch.ElapsedMilliseconds / (1000 * n);
-            Console.WriteLine("Accurate mode: {0} ms, average: {1} / second",
-                                timeConsumed, fileSize / timeConsumed);
-
-            // Full mode
-            stopWatch.Reset();
-            stopWatch.Start();
-
-            for (var i = 0; i < n; i++)
-            {
-                seg.Cut(weiCheng, true);
-            }
-
-            stopWatch.Stop();
-
-            timeConsumed = (double)stopWatch.ElapsedMilliseconds / (1000 * n);
-            Console.WriteLine("Full mode: {0} ms, average: {1} / second",
-                                timeConsumed, fileSize / timeConsumed);
+            seg.Cut(weiCheng, true);
         }
+
+        stopWatch.Stop();
+
+        timeConsumed = (double)stopWatch.ElapsedMilliseconds / (1000 * n);
+        Console.WriteLine("Full mode: {0} ms, average: {1} / second",
+            timeConsumed, fileSize / timeConsumed);
+    }
         
-        [TestCase]
-        public void TestCutManySentences()
+    [TestCase]
+    public void TestCutManySentences()
+    {
+        var text = GetTestSentences().Join(string.Empty);
+        var fileSize = 1532 * 100;
+
+        var seg = new JiebaSegmenter();
+        seg.Cut("热身一下");
+
+        Console.WriteLine("Start to cut");
+        const int n = 2;
+        var stopWatch = new Stopwatch();
+
+        // Accurate mode
+        stopWatch.Start();
+
+        for (var i = 0; i < n; i++)
         {
-            var text = GetTestSentences().Join(string.Empty);
-            var fileSize = 1532 * 100;
-
-            var seg = new JiebaSegmenter();
-            seg.Cut("热身一下");
-
-            Console.WriteLine("Start to cut");
-            const int n = 2;
-            var stopWatch = new Stopwatch();
-
-            // Accurate mode
-            stopWatch.Start();
-
-            for (var i = 0; i < n; i++)
-            {
-                seg.Cut(text);
-            }
-
-            stopWatch.Stop();
-            var timeConsumed = (double)stopWatch.ElapsedMilliseconds / (1000 * n);
-            Console.WriteLine("Accurate mode: {0} ms, average: {1} / second",
-                                timeConsumed, fileSize / timeConsumed);
-
-            // Full mode
-            stopWatch.Reset();
-            stopWatch.Start();
-
-            for (var i = 0; i < n; i++)
-            {
-                seg.Cut(text, true);
-            }
-
-            stopWatch.Stop();
-
-            timeConsumed = (double)stopWatch.ElapsedMilliseconds / (1000 * n);
-            Console.WriteLine("Full mode: {0} ms, average: {1} / second",
-                                timeConsumed, fileSize / timeConsumed);
+            seg.Cut(text);
         }
+
+        stopWatch.Stop();
+        var timeConsumed = (double)stopWatch.ElapsedMilliseconds / (1000 * n);
+        Console.WriteLine("Accurate mode: {0} ms, average: {1} / second",
+            timeConsumed, fileSize / timeConsumed);
+
+        // Full mode
+        stopWatch.Reset();
+        stopWatch.Start();
+
+        for (var i = 0; i < n; i++)
+        {
+            seg.Cut(text, true);
+        }
+
+        stopWatch.Stop();
+
+        timeConsumed = (double)stopWatch.ElapsedMilliseconds / (1000 * n);
+        Console.WriteLine("Full mode: {0} ms, average: {1} / second",
+            timeConsumed, fileSize / timeConsumed);
     }
 }

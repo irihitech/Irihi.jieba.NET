@@ -1,93 +1,82 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace JiebaNet.Analyser
+namespace JiebaNet.Analyser;
+
+internal readonly record struct Edge(string Start, string End, double Weight);
+
+internal class UndirectWeightedGraph
 {
-    public class Edge
+    private static readonly double d = 0.85;
+
+    private readonly Dictionary<string, List<Edge>> _graph = new();
+
+    public void AddEdge(string start, string end, double weight)
     {
-        public string Start { get; set; }
-        public string End { get; set; }
-        public double Weight { get; set; }
+        if (!_graph.ContainsKey(start))
+        {
+            _graph[start] = new List<Edge>();
+        }
+
+        if (!_graph.ContainsKey(end))
+        {
+            _graph[end] = new List<Edge>();
+        }
+
+        _graph[start].Add(new Edge(start, end, weight));
+        _graph[end].Add(new Edge(end, start, weight));
     }
 
-    public class UndirectWeightedGraph
+    public IDictionary<string, double> Rank()
     {
-        private static readonly double d = 0.85;
+        var ws = new Dictionary<string, double>();
+        var outSum = new Dictionary<string, double>();
 
-        public IDictionary<string, List<Edge>> Graph { get; set; } 
-        public UndirectWeightedGraph()
+        // init scores
+        var count = _graph.Count > 0 ? _graph.Count : 1;
+        var wsdef = 1.0/count;
+
+        foreach (var pair in _graph)
         {
-            Graph = new Dictionary<string, List<Edge>>();
+            ws[pair.Key] = wsdef;
+            outSum[pair.Key] = pair.Value.Sum(e => e.Weight);
         }
 
-        public void AddEdge(string start, string end, double weight)
+        // TODO: 10 iterations?
+        var sortedKeys = _graph.Keys.OrderBy(k => k).ToList();
+        for (var i = 0; i < 10; i++)
         {
-            if (!Graph.ContainsKey(start))
+            foreach (var n in sortedKeys)
             {
-                Graph[start] = new List<Edge>();
+                var s = 0d;
+                foreach (var edge in _graph[n])
+                {
+                    s += edge.Weight/outSum[edge.End]*ws[edge.End];
+                }
+                ws[n] = (1 - d) + d*s;
             }
-
-            if (!Graph.ContainsKey(end))
-            {
-                Graph[end] = new List<Edge>();
-            }
-
-            Graph[start].Add(new Edge(){ Start = start, End = end, Weight = weight });
-            Graph[end].Add(new Edge(){ Start = end, End = start, Weight = weight });
         }
 
-        public IDictionary<string, double> Rank()
+        var minRank = double.MaxValue;
+        var maxRank = double.MinValue;
+
+        foreach (var w in ws.Values)
         {
-            var ws = new Dictionary<string, double>();
-            var outSum = new Dictionary<string, double>();
-
-            // init scores
-            var count = Graph.Count > 0 ? Graph.Count : 1;
-            var wsdef = 1.0/count;
-
-            foreach (var pair in Graph)
+            if (w < minRank)
             {
-                ws[pair.Key] = wsdef;
-                outSum[pair.Key] = pair.Value.Sum(e => e.Weight);
+                minRank = w;
             }
-
-            // TODO: 10 iterations?
-            var sortedKeys = Graph.Keys.OrderBy(k => k);
-            for (var i = 0; i < 10; i++)
+            if(w > maxRank)
             {
-                foreach (var n in sortedKeys)
-                {
-                    var s = 0d;
-                    foreach (var edge in Graph[n])
-                    {
-                        s += edge.Weight/outSum[edge.End]*ws[edge.End];
-                    }
-                    ws[n] = (1 - d) + d*s;
-                }
+                maxRank = w;
             }
-
-            var minRank = double.MaxValue;
-            var maxRank = double.MinValue;
-
-            foreach (var w in ws.Values)
-            {
-                if (w < minRank)
-                {
-                    minRank = w;
-                }
-                if(w > maxRank)
-                {
-                    maxRank = w;
-                }
-            }
-
-            foreach (var pair in ws.ToList())
-            {
-                ws[pair.Key] = (pair.Value - minRank/10.0)/(maxRank - minRank/10.0);
-            }
-
-            return ws;
         }
+
+        foreach (var pair in ws.ToList())
+        {
+            ws[pair.Key] = (pair.Value - minRank/10.0)/(maxRank - minRank/10.0);
+        }
+
+        return ws;
     }
 }
