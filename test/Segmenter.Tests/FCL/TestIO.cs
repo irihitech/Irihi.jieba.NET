@@ -2,12 +2,9 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
 using JiebaNet.Segmenter.Common;
 using NUnit.Framework;
-using NUnit.Framework.Internal;
-using OSPlatform = NUnit.Framework.Internal.OSPlatform;
 
 namespace JiebaNet.Segmenter.Tests.FCL;
 

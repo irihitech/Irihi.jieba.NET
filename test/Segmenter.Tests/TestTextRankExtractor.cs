@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using JiebaNet.Analyser;
 using NUnit.Framework;
 
